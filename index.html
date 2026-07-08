@@ -718,24 +718,50 @@ function updateBgOpacity(val){
   document.querySelector('.bokeh-layer').style.setProperty('--bg-opacity',val/100);
   localStorage.setItem('timeplanner_bg_opacity',val);
 }
-// Load saved opacity
-var savedOpacity=localStorage.getItem('timeplanner_bg_opacity');
-if(savedOpacity){
-  document.getElementById('bgOpacity').value=savedOpacity;
-  document.querySelector('.bokeh-layer').style.setProperty('--bg-opacity',savedOpacity/100);
-}
-// Load saved custom bg image
-var savedBg=localStorage.getItem('timeplanner_bg_image');
-if(savedBg){
-  document.querySelector('.bokeh-layer').style.background='url('+savedBg+') center/cover';
-}
+// Load saved opacity and bg image on DOM ready
+document.addEventListener('DOMContentLoaded',function(){
+  var savedOpacity=localStorage.getItem('timeplanner_bg_opacity');
+  if(savedOpacity){
+    var slider=document.getElementById('bgOpacity');
+    if(slider)slider.value=savedOpacity;
+    document.querySelector('.bokeh-layer').style.setProperty('--bg-opacity',savedOpacity/100);
+  }
+  var savedBg=localStorage.getItem('timeplanner_bg_image');
+  if(savedBg){
+    document.querySelector('.bokeh-layer').style.background='url('+savedBg+') center/cover';
+  }
+});
+
+// Also run immediately (script is at bottom of body)
+(function(){
+  var savedOpacity=localStorage.getItem('timeplanner_bg_opacity');
+  if(savedOpacity){
+    var slider=document.getElementById('bgOpacity');
+    if(slider)slider.value=savedOpacity;
+    document.querySelector('.bokeh-layer').style.setProperty('--bg-opacity',savedOpacity/100);
+  }
+  var savedBg=localStorage.getItem('timeplanner_bg_image');
+  if(savedBg){
+    document.querySelector('.bokeh-layer').style.background='url('+savedBg+') center/cover';
+  }
+})();
 function loadLocalBg(input){
   var file=input.files[0];if(!file)return;
   var reader=new FileReader();
   reader.onload=function(e){
-    var dataUrl=e.target.result;
-    document.querySelector('.bokeh-layer').style.background='url('+dataUrl+') center/cover';
-    localStorage.setItem('timeplanner_bg_image',dataUrl);
+    // Compress large images via canvas to fit in localStorage
+    var img=new Image();
+    img.onload=function(){
+      var cv=document.createElement('canvas');
+      var maxW=800;var scale=Math.min(1,maxW/img.width);
+      cv.width=img.width*scale;cv.height=img.height*scale;
+      var ctx=cv.getContext('2d');ctx.drawImage(img,0,0,cv.width,cv.height);
+      var dataUrl=cv.toDataURL('image/jpeg',0.6);
+      document.querySelector('.bokeh-layer').style.background='url('+dataUrl+') center/cover';
+      try{localStorage.setItem('timeplanner_bg_image',dataUrl);}
+      catch(ex){console.log('图片太大，已压缩存储');}
+    };
+    img.src=e.target.result;
   };
   reader.readAsDataURL(file);
 }
