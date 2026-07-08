@@ -63,28 +63,28 @@
   /* ═══════════════════════════════════════════════════════════
      TIMELINE — half-hour grid inside each day card
      ═══════════════════════════════════════════════════════════ */
-  .timeline-wrap{position:relative;z-index:1;overflow-y:auto;max-height:680px;padding-right:2px;}
+  .timeline-wrap{position:relative;z-index:1;overflow-y:auto;max-height:680px;padding-right:2px;padding-left:48px;margin-left:-8px;}
   .timeline-wrap::-webkit-scrollbar{width:3px;}
   .timeline-wrap::-webkit-scrollbar-thumb{background:rgba(255,255,255,0.08);border-radius:2px;}
   .timeline{position:relative;min-height:1440px;} /* 6-24h, 20px per 15min */
   .tl-slot{
-    position:absolute;left:4px;right:4px;height:20px;
+    position:absolute;left:0;right:4px;height:20px;
     border-top:1px solid rgba(255,255,255,0.025);
     display:flex;align-items:flex-start;
   }
   .tl-slot.even{border-top:1px solid rgba(255,255,255,0.06);}
   .tl-slot.h2{border-top:2px solid rgba(255,255,255,0.15);}
   .tl-label{
-    position:absolute;left:-52px;top:-7px;width:44px;text-align:right;padding-right:4px;
+    position:absolute;left:-50px;top:-7px;width:44px;text-align:right;padding-right:4px;
     font-size:12px;color:#999;user-select:none;font-weight:600;
   }
-  .tl-label.h2{left:-56px;width:48px;color:#ddd;font-size:13px;font-weight:700;}
+  .tl-label.h2{width:48px;color:#ddd;font-size:13px;font-weight:700;}
   .day-card:not(.today) .tl-label{left:-42px;width:36px;font-size:10px;}
-  .day-card:not(.today) .tl-label.h2{left:-45px;font-size:11px;}
+  .day-card:not(.today) .tl-label.h2{font-size:11px;}
 
   /* Task block inside timeline — absolute positioned */
   .task-block{
-    position:absolute;left:4px;right:4px;z-index:2;cursor:grab;user-select:none;
+    position:absolute;left:0;right:4px;z-index:2;cursor:grab;user-select:none;
   }
   .task-block.dragging{z-index:10;cursor:grabbing;opacity:0.85;filter:brightness(1.2);}
   .task-block .block-inner{
