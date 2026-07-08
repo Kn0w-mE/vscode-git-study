@@ -615,19 +615,47 @@ function cycleEntryStatus(el){
 function batchMark(dt,st){var e=le(dt);e.forEach(function(x){x.status=st;});se(dt,e);renderAll();}
 function openPicker(dt){
   var h='<div class="modal-overlay" onclick="if(event.target===this)closeModal()">';
-  h+='<div class="modal"><h3>选择方块 · '+fd(dt)+'</h3>';
-  if(blocks.length===0){h+='<div class="empty-state"><div class="msg">方块库是空的，先去「方块库」新建吧</div></div>';}
-  else{
+  h+='<div class="modal"><h3>添加任务 · '+fd(dt)+'</h3>';
+
+  // Quick-create — saves to both day AND block library
+  h+='<div style="background:rgba(255,255,255,0.04);border-radius:14px;padding:14px;margin-bottom:14px;border:1px solid rgba(255,255,255,0.06);">';
+  h+='<div style="font-size:12px;color:#7c7c86;margin-bottom:8px;">⚡ 快速新建（同步保存到方块库）</div>';
+  h+='<div style="display:flex;gap:8px;">';
+  h+='<input id="qpName" placeholder="任务名称" style="flex:1;padding:8px 12px;border-radius:10px;border:1px solid rgba(255,255,255,0.1);background:rgba(255,255,255,0.05);color:#e8e8ed;font-size:13px;font-family:inherit;">';
+  h+='<input id="qpDur" type="number" value="60" min="5" step="5" style="width:70px;padding:8px;border-radius:10px;border:1px solid rgba(255,255,255,0.1);background:rgba(255,255,255,0.05);color:#e8e8ed;font-size:13px;text-align:center;">';
+  h+='<span style="font-size:11px;color:#7c7c86;align-self:center;">分钟</span>';
+  h+='<button onclick="quickAddBlock(\''+dt+'\')" style="padding:8px 16px;border-radius:10px;background:rgba(100,180,255,0.15);color:#88bff0;border:1px solid rgba(100,180,255,0.2);cursor:pointer;font-size:13px;font-weight:600;white-space:nowrap;">+ 添加</button>';
+  h+='</div></div>';
+
+  // Existing blocks
+  if(blocks.length>0){
+    h+='<div style="font-size:12px;color:#7c7c86;margin-bottom:6px;">📦 方块库</div>';
     h+='<div class="picker-list">';
     blocks.forEach(function(b){
       h+='<div class="picker-item" onclick="addBlockToDay(\''+dt+'\',\''+b.id+'\')">';
-      h+='<div><div class="pick-name">'+b.name+'</div><div style="font-size:11px;color:#7c7c86;">'+cn(b.category||'other')+'</div></div>';
-      h+='<span class="pick-dur">'+fm(b.duration)+'</span></div>';
+      h+='<div><div class="pick-name">'+b.name+'</div><div style="font-size:11px;color:#7c7c86;">'+cn(b.category||'other')+' · '+fm(b.duration)+'</div></div>';
+      h+='<span style="font-size:11px;color:#6a6a74;">选择</span></div>';
     });
     h+='</div>';
   }
+
   h+='<div class="modal-actions"><button class="btn-cancel" onclick="closeModal()">取消</button></div></div></div>';
   document.getElementById('modalContainer').innerHTML=h;
+  setTimeout(function(){var inp=document.getElementById('qpName');if(inp)inp.focus();},100);
+}
+
+function quickAddBlock(dt){
+  var name=document.getElementById('qpName').value.trim();
+  var dur=parseInt(document.getElementById('qpDur').value)||60;
+  if(!name)return;
+  // Save to block library
+  var nb={id:uid(),name:name,duration:dur,category:'other',priority:'medium',notes:''};
+  blocks.push(nb);sb(blocks);
+  // Add to day entries
+  var e=le(dt);
+  e.push({id:uid(),name:name,duration:dur,category:'other',priority:'medium',status:'pending',order:e.length});
+  se(dt,e);
+  closeModal();renderAll();
 }
 function addBlockToDay(dt,bid){
   var b=blocks.find(function(x){return x.id===bid;});if(!b)return;
