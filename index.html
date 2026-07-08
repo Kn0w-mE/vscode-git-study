@@ -72,12 +72,15 @@
     border-top:1px solid rgba(255,255,255,0.025);
     display:flex;align-items:flex-start;
   }
-  .tl-slot.even{border-top:1px solid rgba(255,255,255,0.05);}
+  .tl-slot.even{border-top:1px solid rgba(255,255,255,0.06);}
+  .tl-slot.h2{border-top:2px solid rgba(255,255,255,0.15);}
   .tl-label{
     position:absolute;left:-32px;top:-6px;width:28px;text-align:right;
     font-size:12px;color:#999;user-select:none;font-weight:600;
   }
+  .tl-label.h2{color:#ccc;font-size:13px;font-weight:700;}
   .day-card:not(.today) .tl-label{left:-28px;font-size:10px;}
+  .day-card:not(.today) .tl-label.h2{font-size:11px;}
 
   /* Task block inside timeline — absolute positioned */
   .task-block{
@@ -289,8 +292,8 @@ function renderThreeDay(){
   var h='';
   for(var i=0;i<3;i++){
     var dt=ds(off[i]),entries=le(dt);
-    // Assign default startTime if missing
-    var nextTime=START_H*60; // default 6:00
+    // Assign default startTime if missing (snap to 15min)
+    var nextTime=START_H*60;
     entries.forEach(function(e){if(!e.startTime){e.startTime=nextTime;nextTime=e.startTime+(e.duration||30);}});
     var tm=0,dn=0,fl=0;
     entries.forEach(function(e){tm+=e.duration||0;if(e.status==='done')dn++;else if(e.status==='failed')fl++;});
@@ -304,9 +307,9 @@ function renderThreeDay(){
 
     // Time grid lines + labels
     for(var t=START_H*60;t<=END_H*60;t+=15){
-      var isHour=(t%60===0);
-      h+='<div class="tl-slot'+(isHour?' even':'')+'" style="top:'+timeToTop(t)+'px">';
-      if(isHour)h+='<span class="tl-label">'+Math.floor(t/60)+':00</span>';
+      var isHour=(t%60===0),isH2=(t%120===0);
+      h+='<div class="tl-slot'+(isH2?' h2':(isHour?' even':''))+'" style="top:'+timeToTop(t)+'px">';
+      if(isHour)h+='<span class="tl-label'+(isH2?' h2':'')+'">'+Math.floor(t/60)+':00</span>';
       h+='</div>';
     }
 
