@@ -493,15 +493,21 @@ function renderSummary(period){
   else if(summaryPeriod==='weekly'){for(var i=6;i>=0;i--)dates.push(ds(-i));}
   else{for(var i=29;i>=0;i--)dates.push(ds(-i));}
 
-  var totalMin=0,dn=0,fl=0,pn=0,doneTasks=[];
+  var totalMin=0,dn=0,fl=0,pn=0,doneMap={};
   dates.forEach(function(dt){
     le(dt).forEach(function(e){
       totalMin+=e.duration||0;
-      if(e.status==='done'){dn++;doneTasks.push({name:e.name,duration:e.duration||0,category:e.category||'other'});}
+      if(e.status==='done'){
+        dn++;
+        var key=e.name;
+        if(!doneMap[key])doneMap[key]={name:e.name,duration:0,category:e.category||'other'};
+        doneMap[key].duration+=e.duration||0;
+      }
       else if(e.status==='failed')fl++;
       else pn++;
     });
   });
+  var doneTasks=Object.values(doneMap).sort(function(a,b){return b.duration-a.duration;});
   var tot=dn+fl+pn;
   var rate=tot>0?Math.round(dn/tot*100):0;
   var doneMin=doneTasks.reduce(function(s,t){return s+t.duration;},0);
