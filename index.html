@@ -271,7 +271,7 @@ var START_H=6; // 6:00
 var END_H=26;  // 2:00 (next day)
 function timeToTop(min){return (min-START_H*60)/15*SLOT_H;}
 function topToTime(top){var m=Math.round(top/SLOT_H*15)+START_H*60;return Math.max(START_H*60,Math.min(END_H*60,m));}
-function fmtTime(min){var h=Math.floor(min/60),m=min%60;return h+':'+(m<10?'0':'')+m;}
+function fmtTime(min){var h=Math.floor(min/60),m=min%60;if(h>=24)h-=24;return h+':'+(m<10?'0':'')+m;}
 
 /* ═══════════════════════════════════════════════════════════
    RENDER
