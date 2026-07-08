@@ -47,8 +47,8 @@
   }
   .app-title:hover{background:rgba(255,255,255,0.06);}
   .app-title input{font-family:inherit;font-size:inherit;font-weight:inherit;color:inherit;letter-spacing:inherit;border:none;outline:none;background:transparent;width:auto;min-width:150px;border-bottom:2px solid rgba(100,180,255,0.5);padding:0;}
-  .app-title .edit-hint{font-size:28px;font-weight:800;color:#c8c8d2;font-family:'JetBrains Mono','SF Mono','Consolas',-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei',sans-serif;letter-spacing:2px;opacity:1;}
-  .app-title:hover .edit-hint{opacity:1;}
+  .app-title .edit-hint-cn{font-size:30px;font-weight:900;color:#e0dff0;font-family:'PingFang SC','Microsoft YaHei','Noto Sans SC',-apple-system,BlinkMacSystemFont,sans-serif;letter-spacing:0;opacity:1;margin:0 1px;}
+  .app-title .edit-hint{font-size:28px;font-weight:800;color:#c8c8d2;font-family:'JetBrains Mono','SF Mono','Consolas',monospace;letter-spacing:1px;opacity:1;}
   .header .sub{font-size:16px;color:#7c7c86;margin-top:4px;font-weight:400;}
   .date-badge{
     background:rgba(60,60,70,0.45);backdrop-filter:blur(30px);-webkit-backdrop-filter:blur(30px);
@@ -339,7 +339,7 @@
 <div class="scene">
   <div class="header">
     <div>
-      <div class="app-title" id="appTitle" title="点击修改名称"><span id="titleText">Asuka</span><span class="edit-hint">的Time</span></div>
+      <div class="app-title" id="appTitle" title="点击修改名称"><span id="titleText">Asuka</span><span class="edit-hint-cn">的</span><span class="edit-hint">Time</span></div>
     </div>
     <div class="date-badge" id="dateBadge">📅 加载中...</div>
   </div>
