@@ -357,10 +357,13 @@
   <div class="view-panel" id="view-library"><div class="library-grid" id="libraryGrid"></div></div>
 
   <div class="footer">
-    <div style="display:flex;align-items:center;gap:8px;">
-      <span style="font-size:11px;">🌃 背景透明度</span>
-      <input type="range" id="bgOpacity" min="0" max="100" value="70" style="width:80px;accent-color:#888;"
-        oninput="document.querySelector('.bokeh-layer').style.setProperty('--bg-opacity',this.value/100)">
+    <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+      <label style="font-size:11px;cursor:pointer;padding:4px 10px;border-radius:10px;border:1px solid rgba(255,255,255,0.1);background:rgba(255,255,255,0.03);">
+        🖼️ 更换背景<input type="file" id="bgFileInput" accept="image/*" style="display:none;" onchange="loadLocalBg(this)">
+      </label>
+      <span style="font-size:11px;">透明度</span>
+      <input type="range" id="bgOpacity" min="0" max="100" value="70" style="width:70px;accent-color:#888;"
+        oninput="updateBgOpacity(this.value)">
     </div>
     <div><span class="status-dot"></span>💾 已自动保存</div>
   </div>
@@ -490,18 +493,18 @@ function renderSummary(period){
   else if(summaryPeriod==='weekly'){for(var i=6;i>=0;i--)dates.push(ds(-i));}
   else{for(var i=29;i>=0;i--)dates.push(ds(-i));}
 
-  var totalMin=0,dn=0,fl=0,pn=0,cats={};
+  var totalMin=0,dn=0,fl=0,pn=0,doneTasks=[];
   dates.forEach(function(dt){
     le(dt).forEach(function(e){
       totalMin+=e.duration||0;
-      if(e.status==='done'){dn++;var cat=e.category||'other';cats[cat]=(cats[cat]||0)+e.duration;}
+      if(e.status==='done'){dn++;doneTasks.push({name:e.name,duration:e.duration||0,category:e.category||'other'});}
       else if(e.status==='failed')fl++;
       else pn++;
     });
   });
   var tot=dn+fl+pn;
   var rate=tot>0?Math.round(dn/tot*100):0;
-  var doneMin=Object.values(cats).reduce(function(s,v){return s+v;},0);
+  var doneMin=doneTasks.reduce(function(s,t){return s+t.duration;},0);
 
   // Tabs
   var h='<div class="summary-tabs">';
@@ -519,54 +522,48 @@ function renderSummary(period){
   h+='<div class="stat-line"><span>⏱ 总时长</span><span class="stat-val">'+fm(totalMin)+'</span></div>';
   h+='</div>';
 
-  // Pie chart card
-  var catEntries=Object.entries(cats).sort(function(a,b){return b[1]-a[1];});
-  h+='<div class="summary-chart"><h3>已完成任务 · 分类占比</h3>';
+  // Pie chart card — each completed TASK is a slice
+  h+='<div class="summary-chart"><h3>已完成任务 · 时间占比</h3>';
   h+='<canvas id="pieCanvas" width="260" height="260"></canvas>';
   h+='<div class="pie-legend">';
-  if(catEntries.length===0){
+  if(doneTasks.length===0){
     h+='<div style="color:#6a6a74;font-size:14px;">暂无已完成任务</div>';
   }else{
-    catEntries.forEach(function(e){
-      var pct=Math.round(e[1]/doneMin*100);
-      h+='<div class="leg-item"><span class="leg-dot" style="background:'+(CAT_COLORS[e[0]]||'#888')+';"></span>'+cn(e[0])+' '+fm(e[1])+' ('+pct+'%)</div>';
+    doneTasks.forEach(function(t,i){
+      var pct=Math.round(t.duration/doneMin*100);
+      h+='<div class="leg-item"><span class="leg-dot" style="background:'+(CAT_COLORS[t.category]||'#888')+';"></span>'+t.name+' '+fm(t.duration)+' ('+pct+'%)</div>';
     });
   }
   h+='</div></div></div>';
   c.innerHTML=h;
 
-  // Draw pie chart
+  // Draw pie
   setTimeout(function(){
     var pc=document.getElementById('pieCanvas');if(!pc)return;
     var pctx=pc.getContext('2d');
     var cx=130,cy=130,r=115;
     pctx.clearRect(0,0,260,260);
-    if(catEntries.length===0||doneMin===0){
+    if(doneTasks.length===0||doneMin===0){
       pctx.fillStyle='#6a6a74';pctx.font='15px system-ui';pctx.textAlign='center';pctx.textBaseline='middle';
-      pctx.fillText('暂无数据',cx,cy);
-      return;
+      pctx.fillText('暂无数据',cx,cy);return;
     }
     var angle=-Math.PI/2;
-    var catColors=['#5aaa7a','#5090c0','#d4a040','#9060b8','#e86868','#60b0a0','#c08050'];
-    var ci=0;
-    catEntries.forEach(function(e){
-      var slice=(e[1]/doneMin)*Math.PI*2;
-      if(slice<0.02)return;
+    var sliceColors=['#5aaa7a','#5090c0','#d4a040','#9060b8','#e86868','#60b0a0','#c08050','#88a0d0','#c09060','#78b0a0'];
+    doneTasks.forEach(function(t,i){
+      var slice=(t.duration/doneMin)*Math.PI*2;
       pctx.beginPath();pctx.moveTo(cx,cy);
       pctx.arc(cx,cy,r,angle,angle+slice);
       pctx.closePath();
-      pctx.fillStyle=catColors[ci%catColors.length];
+      pctx.fillStyle=sliceColors[i%sliceColors.length];
       pctx.fill();
       pctx.strokeStyle='rgba(30,30,40,0.6)';pctx.lineWidth=2.5;pctx.stroke();
-      var mid=angle+slice/2;
-      var pct=Math.round(e[1]/doneMin*100);
+      var pct=Math.round(t.duration/doneMin*100);
       if(pct>=8){
-        var lx=cx+Math.cos(mid)*r*0.65;
-        var ly=cy+Math.sin(mid)*r*0.65;
-        pctx.fillStyle='#fff';pctx.font='bold 12px system-ui';pctx.textAlign='center';pctx.textBaseline='middle';
-        pctx.fillText(pct+'%',lx,ly);
+        var mid=angle+slice/2;
+        pctx.fillStyle='#fff';pctx.font='bold 11px system-ui';pctx.textAlign='center';pctx.textBaseline='middle';
+        pctx.fillText(pct+'%',cx+Math.cos(mid)*r*0.65,cy+Math.sin(mid)*r*0.65);
       }
-      angle+=slice;ci++;
+      angle+=slice;
     });
     pctx.beginPath();pctx.arc(cx,cy,28,0,Math.PI*2);
     pctx.fillStyle='rgba(40,40,52,0.9)';pctx.fill();
@@ -707,6 +704,35 @@ document.addEventListener('click',function(e){
   rp.style.left=(e.clientX-rect.left-s/2)+'px';rp.style.top=(e.clientY-rect.top-s/2)+'px';
   t.appendChild(rp);rp.addEventListener('animationend',function(){rp.remove();});
 });
+
+// ═══════════════════════════════════════════════════════════════
+//  BACKGROUND: opacity persistence + local image
+// ═══════════════════════════════════════════════════════════════
+function updateBgOpacity(val){
+  document.querySelector('.bokeh-layer').style.setProperty('--bg-opacity',val/100);
+  localStorage.setItem('timeplanner_bg_opacity',val);
+}
+// Load saved opacity
+var savedOpacity=localStorage.getItem('timeplanner_bg_opacity');
+if(savedOpacity){
+  document.getElementById('bgOpacity').value=savedOpacity;
+  document.querySelector('.bokeh-layer').style.setProperty('--bg-opacity',savedOpacity/100);
+}
+// Load saved custom bg image
+var savedBg=localStorage.getItem('timeplanner_bg_image');
+if(savedBg){
+  document.querySelector('.bokeh-layer').style.background='url('+savedBg+') center/cover';
+}
+function loadLocalBg(input){
+  var file=input.files[0];if(!file)return;
+  var reader=new FileReader();
+  reader.onload=function(e){
+    var dataUrl=e.target.result;
+    document.querySelector('.bokeh-layer').style.background='url('+dataUrl+') center/cover';
+    localStorage.setItem('timeplanner_bg_image',dataUrl);
+  };
+  reader.readAsDataURL(file);
+}
 
 // ═══════════════════════════════════════════════════════════════
 //  INIT
