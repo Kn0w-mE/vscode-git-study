@@ -12,43 +12,10 @@
      ═══════════════════════════════════════════════════════════ */
   .bokeh-layer{
     position:fixed;inset:-40px;z-index:0;pointer-events:none;
-    filter:blur(8px) brightness(0.7);
+    filter:blur(8px);
     overflow:hidden;
     background:url(background.jpg) center/cover;
-  }
-  .bokeh-layer .light{
-    position:absolute;border-radius:50%;
-    animation:lightPulse 6s ease-in-out infinite;
-  }
-  @keyframes lightPulse{0%,100%{opacity:0.5;transform:scale(1)}50%{opacity:0.95;transform:scale(1.3)}}
-  .bokeh-layer .light:nth-child(1){width:180px;height:180px;background:radial-gradient(circle,rgba(255,80,100,0.9),transparent);top:10%;left:8%}
-  .bokeh-layer .light:nth-child(2){width:120px;height:120px;background:radial-gradient(circle,rgba(100,180,255,0.85),transparent);top:15%;left:25%;animation-delay:-1.5s}
-  .bokeh-layer .light:nth-child(3){width:100px;height:100px;background:radial-gradient(circle,rgba(255,200,80,0.8),transparent);top:8%;left:45%;animation-delay:-3s}
-  .bokeh-layer .light:nth-child(4){width:160px;height:160px;background:radial-gradient(circle,rgba(220,100,255,0.75),transparent);top:5%;left:65%;animation-delay:-4.5s}
-  .bokeh-layer .light:nth-child(5){width:90px;height:90px;background:radial-gradient(circle,rgba(80,220,180,0.8),transparent);top:12%;left:80%;animation-delay:-2s}
-  .bokeh-layer .light:nth-child(6){width:140px;height:140px;background:radial-gradient(circle,rgba(255,140,80,0.7),transparent);top:25%;left:15%;animation-delay:-5s}
-  .bokeh-layer .light:nth-child(7){width:110px;height:110px;background:radial-gradient(circle,rgba(130,160,255,0.8),transparent);top:30%;left:55%;animation-delay:-1s}
-  .bokeh-layer .light:nth-child(8){width:100px;height:100px;background:radial-gradient(circle,rgba(255,100,150,0.75),transparent);top:20%;left:90%;animation-delay:-3.5s}
-  .bokeh-layer .light:nth-child(9){width:130px;height:130px;background:radial-gradient(circle,rgba(200,200,100,0.7),transparent);top:35%;left:35%;animation-delay:-2.5s}
-  .bokeh-layer .light:nth-child(10){width:80px;height:80px;background:radial-gradient(circle,rgba(100,255,200,0.75),transparent);top:40%;left:75%}
-  .bokeh-layer .light:nth-child(11){width:150px;height:150px;background:radial-gradient(circle,rgba(255,60,90,0.6),transparent);top:55%;left:5%;animation-delay:-4s}
-  .bokeh-layer .light:nth-child(12){width:100px;height:100px;background:radial-gradient(circle,rgba(80,150,255,0.7),transparent);top:60%;left:30%;animation-delay:-1.8s}
-  .bokeh-layer .light:nth-child(13){width:120px;height:120px;background:radial-gradient(circle,rgba(255,180,60,0.65),transparent);top:50%;left:50%;animation-delay:-3.2s}
-  .bokeh-layer .light:nth-child(14){width:90px;height:90px;background:radial-gradient(circle,rgba(200,80,220,0.7),transparent);top:58%;left:70%;animation-delay:-0.8s}
-  .bokeh-layer .light:nth-child(15){width:140px;height:140px;background:radial-gradient(circle,rgba(60,200,180,0.6),transparent);top:52%;left:88%;animation-delay:-2.2s}
-  .bokeh-layer .light:nth-child(16){width:110px;height:110px;background:radial-gradient(circle,rgba(255,120,100,0.55),transparent);top:75%;left:12%;animation-delay:-1.2s}
-  .bokeh-layer .light:nth-child(17){width:90px;height:90px;background:radial-gradient(circle,rgba(100,180,255,0.6),transparent);top:80%;left:40%;animation-delay:-4.8s}
-  .bokeh-layer .light:nth-child(18){width:130px;height:130px;background:radial-gradient(circle,rgba(255,200,100,0.55),transparent);top:70%;left:60%;animation-delay:-2.8s}
-  .bokeh-layer .light:nth-child(19){width:100px;height:100px;background:radial-gradient(circle,rgba(180,100,240,0.6),transparent);top:78%;left:82%}
-  .bokeh-layer .light:nth-child(20){width:120px;height:120px;background:radial-gradient(circle,rgba(80,220,200,0.5),transparent);top:85%;left:25%;animation-delay:-3.8s}
-  .bokeh-layer .tiny{position:absolute;border-radius:50%;background:rgba(255,255,255,0.7);animation:tinyFlicker 3s ease-in-out infinite;}
-  @keyframes tinyFlicker{0%,100%{opacity:0.3}33%{opacity:0.85}66%{opacity:0.45}}
-
-  /* ═══════════════════════════════════════════════════════════
-     L2: RAIN CANVAS — highly visible drops
-     ═══════════════════════════════════════════════════════════ */
-  #rainCanvas{
-    position:fixed;inset:0;z-index:1;pointer-events:none;
+    opacity:var(--bg-opacity,0.7);
   }
 
   /* ═══════════════════════════════════════════════════════════
@@ -365,20 +332,8 @@
 </head>
 <body>
 
-<!-- L1: BOKEH NIGHT CITY -->
-<div class="bokeh-layer">
-  <div class="light"></div><div class="light"></div><div class="light"></div>
-  <div class="light"></div><div class="light"></div><div class="light"></div>
-  <div class="light"></div><div class="light"></div><div class="light"></div>
-  <div class="light"></div><div class="light"></div><div class="light"></div>
-  <div class="light"></div><div class="light"></div><div class="light"></div>
-  <div class="light"></div><div class="light"></div><div class="light"></div>
-  <div class="light"></div><div class="light"></div>
-  <div id="tinyLights"></div>
-</div>
-
-<!-- L2: RAIN CANVAS -->
-<canvas id="rainCanvas"></canvas>
+<!-- L1: BACKGROUND IMAGE -->
+<div class="bokeh-layer"></div>
 
 <!-- L3: UI -->
 <div class="scene">
@@ -403,6 +358,11 @@
   <div class="view-panel" id="view-library"><div class="library-grid" id="libraryGrid"></div></div>
 
   <div class="footer">
+    <div style="display:flex;align-items:center;gap:8px;">
+      <span style="font-size:11px;">🌃 背景透明度</span>
+      <input type="range" id="bgOpacity" min="0" max="100" value="70" style="width:80px;accent-color:#888;"
+        oninput="document.querySelector('.bokeh-layer').style.setProperty('--bg-opacity',this.value/100)">
+    </div>
     <div><span class="status-dot"></span>💾 已自动保存</div>
   </div>
 </div>
@@ -410,129 +370,7 @@
 <div id="modalContainer"></div>
 
 <script>
-// ═══════════════════════════════════════════════════════════════
-//  L1: TINY LIGHTS
-// ═══════════════════════════════════════════════════════════════
-(function(){
-  var c=document.getElementById('tinyLights');if(!c)return;
-  var h='';for(var i=0;i<120;i++){var x=Math.random()*100,y=Math.random()*100,s=Math.random()*3+1,d=Math.random()*4+1;h+='<div class="tiny" style="left:'+x+'%;top:'+y+'%;width:'+s+'px;height:'+s+'px;animation-delay:'+(-Math.random()*3).toFixed(1)+'s;animation-duration:'+(Math.random()*4+2).toFixed(1)+'s;"></div>';}
-  c.innerHTML=h;
-})();
 
-// ═══════════════════════════════════════════════════════════════
-//  L2: REALISTIC WATER DROPLETS ON GLASS
-//  Flat-bottom teardrops, subtle light refraction, slow growth
-// ═══════════════════════════════════════════════════════════════
-(function(){
-  var c=document.getElementById('rainCanvas');if(!c)return;
-  var ctx=c.getContext('2d');var W,H;
-  function rs(){W=c.width=window.innerWidth;H=c.height=window.innerHeight;}rs();window.addEventListener('resize',rs);
-
-  var drops=[];
-  var MAX_DROPS=25;
-
-  function create(y){
-    var r=Math.random()*7+3; // radius 3-10px
-    return{
-      x:Math.random()*W, y:y!=null?y:Math.random()*H,
-      r:r, maxR:r,
-      grown:false, growth:0,
-      speed:0, trail:[],
-      phase:Math.random()*Math.PI*2
-    };
-  }
-
-  for(var i=0;i<MAX_DROPS;i++) drops.push(create(Math.random()*H));
-
-  function drawDrop(d){
-    // Water drop shape — slightly flattened bottom
-    var cx=d.x, cy=d.y, r=d.r;
-    ctx.save();
-    ctx.translate(cx,cy);
-
-    // Main body — slightly irregular circle
-    ctx.beginPath();
-    // Use bezier to create a water-drop shape (round top, flatter bottom)
-    ctx.moveTo(0,-r);
-    ctx.bezierCurveTo(r*0.9,-r*0.7, r,-r*0.1, r*0.85,r*0.7);
-    ctx.bezierCurveTo(r*0.7,r*0.95, -r*0.7,r*0.95, -r*0.85,r*0.7);
-    ctx.bezierCurveTo(-r,-r*0.1, -r*0.9,-r*0.7, 0,-r);
-    ctx.closePath();
-
-    // Water fill — very subtle blue-white
-    var grad=ctx.createLinearGradient(-r*0.3,-r*0.8,r*0.2,r*0.5);
-    grad.addColorStop(0,'rgba(255,255,255,0.18)');
-    grad.addColorStop(0.5,'rgba(220,230,255,0.08)');
-    grad.addColorStop(1,'rgba(200,210,240,0.04)');
-    ctx.fillStyle=grad;
-    ctx.fill();
-
-    // Glass edge — thin bright line
-    ctx.strokeStyle='rgba(255,255,255,0.2)';
-    ctx.lineWidth=0.6;
-    ctx.stroke();
-
-    // Specular highlight — tiny bright dot at top-left
-    ctx.beginPath();
-    ctx.arc(-r*0.25,-r*0.35,r*0.18,0,Math.PI*2);
-    ctx.fillStyle='rgba(255,255,255,0.5)';
-    ctx.fill();
-
-    // Secondary softer highlight
-    ctx.beginPath();
-    ctx.arc(-r*0.15,-r*0.15,r*0.1,0,Math.PI*2);
-    ctx.fillStyle='rgba(255,255,255,0.2)';
-    ctx.fill();
-
-    ctx.restore();
-  }
-
-  function draw(){
-    ctx.clearRect(0,0,W,H);
-
-    // Spawn new drops at top
-    if(drops.length<MAX_DROPS&&Math.random()<0.04) drops.push(create(-10));
-
-    for(var i=drops.length-1;i>=0;i--){
-      var d=drops[i];
-
-      // Growth phase
-      if(!d.grown){
-        d.r=d.maxR*(0.3+d.growth*0.7);
-        d.growth+=0.008;
-        if(d.growth>=1){d.grown=true;d.r=d.maxR;}
-      }else{
-        // Slowly slide down
-        d.speed+=0.015;
-        d.y+=d.speed;
-        // Subtle wobble
-        d.x+=Math.sin(Date.now()*0.002+d.phase)*0.15;
-      }
-
-      // Draw trail (faint, short)
-      if(d.grown&&d.speed>0.2){
-        d.trail.push({x:d.x,y:d.y});
-        if(d.trail.length>12)d.trail.shift();
-      }
-      if(d.trail.length>1){
-        ctx.beginPath();
-        ctx.moveTo(d.trail[0].x,d.trail[0].y);
-        for(var j=1;j<d.trail.length;j++)ctx.lineTo(d.trail[j].x,d.trail[j].y);
-        ctx.strokeStyle='rgba(255,255,255,0.06)';
-        ctx.lineWidth=d.r*0.5;ctx.lineCap='round';
-        ctx.stroke();
-      }
-
-      drawDrop(d);
-
-      // Remove off screen
-      if(d.y>H+50)drops.splice(i,1);
-    }
-
-    requestAnimationFrame(draw);
-  }
-  draw();
-})();
 
 // ═══════════════════════════════════════════════════════════════
 //  DATA LAYER
@@ -657,12 +495,14 @@ function renderSummary(period){
   dates.forEach(function(dt){
     le(dt).forEach(function(e){
       totalMin+=e.duration||0;
-      if(e.status==='done')dn++;else if(e.status==='failed')fl++;else pn++;
-      var cat=e.category||'other';cats[cat]=(cats[cat]||0)+e.duration;
+      if(e.status==='done'){dn++;var cat=e.category||'other';cats[cat]=(cats[cat]||0)+e.duration;}
+      else if(e.status==='failed')fl++;
+      else pn++;
     });
   });
   var tot=dn+fl+pn;
   var rate=tot>0?Math.round(dn/tot*100):0;
+  var doneMin=Object.values(cats).reduce(function(s,v){return s+v;},0);
 
   // Tabs
   var h='<div class="summary-tabs">';
@@ -685,15 +525,15 @@ function renderSummary(period){
   h+='<canvas id="pieCanvas" width="260" height="260"></canvas>';
   h+='<div class="pie-legend">';
   var catEntries=Object.entries(cats).sort(function(a,b){return b[1]-a[1];});
-  var catTotal=catEntries.reduce(function(s,e){return s+e[1];},0)||1;
+  var pieTotal=doneMin||1;
   catEntries.forEach(function(e){
-    var pct=Math.round(e[1]/catTotal*100);
-    h+='<div class="leg-item"><span class="leg-dot" style="background:'+(CAT_COLORS[e[0]]||'#888')+';"></span>'+cn(e[0])+' '+pct+'%</div>';
+    var pct=Math.round(e[1]/pieTotal*100);
+    h+='<div class="leg-item"><span class="leg-dot" style="background:'+(CAT_COLORS[e[0]]||'#888')+';"></span>'+cn(e[0])+' '+fm(e[1])+' ('+pct+'%)</div>';
   });
   h+='</div></div></div>';
   c.innerHTML=h;
 
-  // Draw pie chart — full slices by category
+  // Draw pie chart — only completed tasks, by category time
   setTimeout(function(){
     var pc=document.getElementById('pieCanvas');if(!pc)return;
     var pctx=pc.getContext('2d');
@@ -702,8 +542,9 @@ function renderSummary(period){
     var angle=-Math.PI/2;
     var catColors=['#5aaa7a','#5090c0','#d4a040','#9060b8','#e86868','#60b0a0','#c08050'];
     var ci=0;
+    var pieTotal=doneMin||1;
     catEntries.forEach(function(e){
-      var slice=(e[1]/catTotal)*Math.PI*2;
+      var slice=(e[1]/pieTotal)*Math.PI*2;
       if(slice<0.02)return;
       pctx.beginPath();pctx.moveTo(cx,cy);
       pctx.arc(cx,cy,r,angle,angle+slice);
@@ -711,22 +552,20 @@ function renderSummary(period){
       pctx.fillStyle=catColors[ci%catColors.length];
       pctx.fill();
       pctx.strokeStyle='rgba(30,30,40,0.6)';pctx.lineWidth=2.5;pctx.stroke();
-      // Label on slice
       var mid=angle+slice/2;
       var lx=cx+Math.cos(mid)*r*0.65;
       var ly=cy+Math.sin(mid)*r*0.65;
-      var pct=Math.round(e[1]/catTotal*100);
+      var pct=Math.round(e[1]/pieTotal*100);
       if(pct>=8){
         pctx.fillStyle='#fff';pctx.font='bold 12px system-ui';pctx.textAlign='center';pctx.textBaseline='middle';
         pctx.fillText(pct+'%',lx,ly);
       }
       angle+=slice;ci++;
     });
-    // Small center hole
     pctx.beginPath();pctx.arc(cx,cy,30,0,Math.PI*2);
     pctx.fillStyle='rgba(40,40,52,0.9)';pctx.fill();
-    pctx.fillStyle='#e0e0e8';pctx.font='bold 14px system-ui';pctx.textAlign='center';pctx.textBaseline='middle';
-    pctx.fillText(fm(catTotal),cx,cy);
+    pctx.fillStyle='#e0e0e8';pctx.font='bold 13px system-ui';pctx.textAlign='center';pctx.textBaseline='middle';
+    pctx.fillText(fm(doneMin),cx,cy);
   },50);
 }
 
