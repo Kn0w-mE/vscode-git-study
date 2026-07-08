@@ -68,23 +68,23 @@
   .timeline-wrap::-webkit-scrollbar-thumb{background:rgba(255,255,255,0.08);border-radius:2px;}
   .timeline{position:relative;min-height:1440px;} /* 6-24h, 20px per 15min */
   .tl-slot{
-    position:absolute;left:0;right:0;height:20px;
+    position:absolute;left:38px;right:0;height:20px;
     border-top:1px solid rgba(255,255,255,0.025);
     display:flex;align-items:flex-start;
   }
   .tl-slot.even{border-top:1px solid rgba(255,255,255,0.06);}
   .tl-slot.h2{border-top:2px solid rgba(255,255,255,0.15);}
   .tl-label{
-    position:absolute;left:-32px;top:-6px;width:28px;text-align:right;
+    position:absolute;left:0;top:-6px;width:34px;text-align:right;
     font-size:12px;color:#999;user-select:none;font-weight:600;
   }
-  .tl-label.h2{color:#ccc;font-size:13px;font-weight:700;}
-  .day-card:not(.today) .tl-label{left:-28px;font-size:10px;}
+  .tl-label.h2{color:#ddd;font-size:13px;font-weight:700;}
+  .day-card:not(.today) .tl-label{width:28px;font-size:10px;}
   .day-card:not(.today) .tl-label.h2{font-size:11px;}
 
   /* Task block inside timeline — absolute positioned */
   .task-block{
-    position:absolute;left:4px;right:4px;z-index:2;cursor:grab;user-select:none;
+    position:absolute;left:42px;right:4px;z-index:2;cursor:grab;user-select:none;
   }
   .task-block.dragging{z-index:10;cursor:grabbing;opacity:0.85;filter:brightness(1.2);}
   .task-block .block-inner{
@@ -123,7 +123,7 @@
 
   /* Idle click zone */
   .idle-zone{
-    position:absolute;left:4px;right:4px;z-index:1;cursor:pointer;
+    position:absolute;left:42px;right:4px;z-index:1;cursor:pointer;
     border-radius:10px;transition:background 0.2s;
   }
   .idle-zone:hover{background:rgba(255,255,255,0.03);}
@@ -406,15 +406,22 @@ function initDrag(){
     block.classList.remove('dragging');
     var newTop=parseFloat(block.style.top);
     var newTime=topToTime(newTop);
-    // Snap to nearest 30min
+    // Snap to nearest 15min
     newTime=Math.round(newTime/15)*15;
-    newTime=Math.max(START_H*60,Math.min(END_H*60-30,newTime));
+    newTime=Math.max(START_H*60,Math.min(END_H*60-15,newTime));
     // Update entry
     var entries=le(dragState.date);
     var entry=entries.find(function(x){return x.id===dragState.entryId;});
     if(entry){entry.startTime=newTime;se(dragState.date,entries);}
+    // Save scroll position before re-render
+    var wrap=dragState.block.closest('.timeline-wrap');
+    var scrollTop=wrap?wrap.scrollTop:0;
+    var date=dragState.date;
     dragState=null;
     renderThreeDay();
+    // Restore scroll position
+    var newWrap=document.getElementById('tw-'+date);
+    if(newWrap)newWrap.scrollTop=scrollTop;
   });
 }
 
