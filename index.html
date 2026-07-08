@@ -68,23 +68,23 @@
   .timeline-wrap::-webkit-scrollbar-thumb{background:rgba(255,255,255,0.08);border-radius:2px;}
   .timeline{position:relative;min-height:1440px;} /* 6-24h, 20px per 15min */
   .tl-slot{
-    position:absolute;left:38px;right:0;height:20px;
+    position:absolute;left:48px;right:0;height:20px;
     border-top:1px solid rgba(255,255,255,0.025);
     display:flex;align-items:flex-start;
   }
   .tl-slot.even{border-top:1px solid rgba(255,255,255,0.06);}
   .tl-slot.h2{border-top:2px solid rgba(255,255,255,0.15);}
   .tl-label{
-    position:absolute;left:0;top:-6px;width:34px;text-align:right;
+    position:absolute;left:0;top:-6px;width:44px;text-align:right;padding-right:6px;
     font-size:12px;color:#999;user-select:none;font-weight:600;
   }
   .tl-label.h2{color:#ddd;font-size:13px;font-weight:700;}
-  .day-card:not(.today) .tl-label{width:28px;font-size:10px;}
+  .day-card:not(.today) .tl-label{width:36px;font-size:10px;}
   .day-card:not(.today) .tl-label.h2{font-size:11px;}
 
   /* Task block inside timeline — absolute positioned */
   .task-block{
-    position:absolute;left:42px;right:4px;z-index:2;cursor:grab;user-select:none;
+    position:absolute;left:52px;right:4px;z-index:2;cursor:grab;user-select:none;
   }
   .task-block.dragging{z-index:10;cursor:grabbing;opacity:0.85;filter:brightness(1.2);}
   .task-block .block-inner{
@@ -123,7 +123,7 @@
 
   /* Idle click zone */
   .idle-zone{
-    position:absolute;left:42px;right:4px;z-index:1;cursor:pointer;
+    position:absolute;left:52px;right:4px;z-index:1;cursor:pointer;
     border-radius:10px;transition:background 0.2s;
   }
   .idle-zone:hover{background:rgba(255,255,255,0.03);}
@@ -409,10 +409,26 @@ function initDrag(){
     // Snap to nearest 15min
     newTime=Math.round(newTime/15)*15;
     newTime=Math.max(START_H*60,Math.min(END_H*60-15,newTime));
-    // Update entry
+    // Get the entry being moved
     var entries=le(dragState.date);
     var entry=entries.find(function(x){return x.id===dragState.entryId;});
-    if(entry){entry.startTime=newTime;se(dragState.date,entries);}
+    if(!entry){dragState=null;return;}
+    var dur=entry.duration||30;
+    // Check overlap with other entries, push down if needed
+    var others=entries.filter(function(x){return x.id!==dragState.entryId;});
+    for(var iter=0;iter<20;iter++){
+      var overlap=false;
+      for(var i=0;i<others.length;i++){
+        var o=others[i];
+        var oStart=o.startTime||START_H*60;
+        var oEnd=oStart+(o.duration||30);
+        if(newTime<oEnd&&(newTime+dur)>oStart){overlap=true;break;}
+      }
+      if(!overlap)break;
+      newTime+=15; // push down by 15min
+    }
+    newTime=Math.min(END_H*60-dur,newTime);
+    entry.startTime=newTime;se(dragState.date,entries);
     // Save scroll position before re-render
     var wrap=dragState.block.closest('.timeline-wrap');
     var scrollTop=wrap?wrap.scrollTop:0;
@@ -515,13 +531,27 @@ function openPicker(dt){
 function quickAddBlock(dt){
   var name=document.getElementById('qpName').value.trim(),dur=parseInt(document.getElementById('qpDur').value)||60;if(!name)return;
   var nb={id:uid(),name:name,duration:dur,category:'other',priority:'medium',notes:''};blocks.push(nb);sb(blocks);
-  var e=le(dt),startTime=window._pickerStartTime||(START_H*60);
+  var e=le(dt),startTime=findFreeSlot(e,dur,window._pickerStartTime||START_H*60);
   e.push({id:uid(),name:name,duration:dur,category:'other',priority:'medium',status:'pending',startTime:startTime,order:e.length});
   se(dt,e);window._pickerStartTime=null;closeModal();renderAll();
 }
+function findFreeSlot(entries,dur,prefer){
+  var t=prefer||START_H*60;
+  for(var iter=0;iter<200;iter++){
+    var ok=true;
+    for(var i=0;i<entries.length;i++){
+      var o=entries[i],os=o.startTime||START_H*60,oe=os+(o.duration||30);
+      if(t<oe&&(t+dur)>os){ok=false;break;}
+    }
+    if(ok)return t;
+    t+=15;
+  }
+  return prefer||START_H*60;
+}
+
 function addBlockToDay(dt,bid){
   var b=blocks.find(function(x){return x.id===bid;});if(!b)return;
-  var e=le(dt),startTime=window._pickerStartTime||(START_H*60);
+  var e=le(dt),startTime=findFreeSlot(e,b.duration,window._pickerStartTime||START_H*60);
   e.push({id:uid(),name:b.name,duration:b.duration,category:b.category||'other',priority:b.priority||'medium',status:'pending',startTime:startTime,order:e.length});
   se(dt,e);window._pickerStartTime=null;closeModal();renderAll();
 }
