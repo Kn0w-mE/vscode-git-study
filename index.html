@@ -57,27 +57,27 @@
   .day-card:hover{border-color:rgba(255,255,255,0.12);transform:translateY(-3px);box-shadow:0 12px 32px rgba(0,0,0,0.3),0 40px 80px rgba(0,0,0,0.35),inset 0 1px 0 rgba(255,255,255,0.08);}
   .day-card.today{background:rgba(65,65,80,0.5);border-color:rgba(120,160,230,0.2);box-shadow:0 8px 28px rgba(0,0,0,0.25),0 30px 70px rgba(80,110,190,0.12),0 60px 120px rgba(80,110,190,0.1),0 0 0 1px rgba(120,160,230,0.06),inset 0 1px 0 rgba(255,255,255,0.08);padding:28px;}
   .card-tilt-surface{position:relative;z-index:1;transform:rotateX(var(--tilt-x,0deg)) rotateY(var(--tilt-y,0deg));transform-style:preserve-3d;transition:transform 0.2s ease-out;}
-  .day-label{font-size:14px;text-transform:uppercase;letter-spacing:2.5px;margin-bottom:16px;font-weight:600;color:#888892;}
-  .day-card.today .day-label{font-size:15px;color:#88a4d0;}
+  .day-label{font-size:16px;text-transform:uppercase;letter-spacing:2.5px;margin-bottom:16px;font-weight:600;color:#888892;}
+  .day-card.today .day-label{font-size:18px;color:#88a4d0;}
 
   /* ═══════════════════════════════════════════════════════════
      TIMELINE — half-hour grid inside each day card
      ═══════════════════════════════════════════════════════════ */
-  .timeline-wrap{position:relative;z-index:1;overflow-y:auto;max-height:620px;padding-right:2px;}
+  .timeline-wrap{position:relative;z-index:1;overflow-y:auto;max-height:680px;padding-right:2px;}
   .timeline-wrap::-webkit-scrollbar{width:3px;}
   .timeline-wrap::-webkit-scrollbar-thumb{background:rgba(255,255,255,0.08);border-radius:2px;}
-  .timeline{position:relative;min-height:936px;} /* 6:00-24:00, 26px per 30min */
+  .timeline{position:relative;min-height:1440px;} /* 6-24h, 20px per 15min */
   .tl-slot{
-    position:absolute;left:0;right:0;height:26px;
+    position:absolute;left:0;right:0;height:20px;
     border-top:1px solid rgba(255,255,255,0.025);
     display:flex;align-items:flex-start;
   }
   .tl-slot.even{border-top:1px solid rgba(255,255,255,0.05);}
   .tl-label{
     position:absolute;left:-32px;top:-6px;width:28px;text-align:right;
-    font-size:9px;color:#555;user-select:none;
+    font-size:11px;color:#666;user-select:none;
   }
-  .day-card:not(.today) .tl-label{left:-28px;font-size:8px;}
+  .day-card:not(.today) .tl-label{left:-28px;font-size:9px;}
 
   /* Task block inside timeline — absolute positioned */
   .task-block{
@@ -85,7 +85,7 @@
   }
   .task-block.dragging{z-index:10;cursor:grabbing;opacity:0.85;filter:brightness(1.2);}
   .task-block .block-inner{
-    border-radius:16px;padding:8px 12px;height:100%;
+    border-radius:16px;padding:10px 14px;height:100%;
     display:flex;justify-content:space-between;align-items:center;
     background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.06);
     box-shadow:inset 0 2px 8px rgba(0,0,0,0.2),inset 0 1px 3px rgba(0,0,0,0.15);
@@ -95,12 +95,12 @@
   .task-block.done .block-inner{background:rgba(80,180,120,0.1);border-color:rgba(100,200,140,0.15);}
   .task-block.failed .block-inner{background:rgba(210,90,90,0.1);border-color:rgba(220,120,120,0.12);}
   .task-block.pending .block-inner{background:rgba(200,160,70,0.08);border-color:rgba(210,175,85,0.12);}
-  .task-name{font-size:15px;font-weight:600;color:#e8e8f0;display:flex;align-items:center;gap:6px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
-  .day-card:not(.today) .task-name{font-size:12px;}
-  .task-meta{font-size:11px;color:#7c7c86;}
-  .day-card:not(.today) .task-meta{font-size:10px;}
-  .task-duration{font-size:12px;font-weight:600;padding:3px 8px;border-radius:10px;background:rgba(255,255,255,0.04);color:#a0a0aa;white-space:nowrap;}
-  .day-card:not(.today) .task-duration{font-size:10px;}
+  .task-name{font-size:17px;font-weight:600;color:#e8e8f0;display:flex;align-items:center;gap:6px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .day-card:not(.today) .task-name{font-size:14px;}
+  .task-meta{font-size:13px;color:#7c7c86;}
+  .day-card:not(.today) .task-meta{font-size:11px;}
+  .task-duration{font-size:14px;font-weight:600;padding:3px 8px;border-radius:10px;background:rgba(255,255,255,0.04);color:#a0a0aa;white-space:nowrap;}
+  .day-card:not(.today) .task-duration{font-size:12px;}
 
   /* Delete button */
   .task-del{
@@ -264,11 +264,11 @@ var CAT_COLORS={work:'#5aaa7a',study:'#5090c0',exercise:'#d4a040',rest:'#9060b8'
 /* ═══════════════════════════════════════════════════════════
    TIMELINE CONSTANTS: 6:00 - 24:00, 26px per 30min
    ═══════════════════════════════════════════════════════════ */
-var SLOT_H=26; // px per 30min
+var SLOT_H=20; // px per 15min
 var START_H=6; // 6:00
 var END_H=24;  // 24:00
-function timeToTop(min){return (min-START_H*60)/30*SLOT_H;}
-function topToTime(top){var m=Math.round(top/SLOT_H*30)+START_H*60;return Math.max(START_H*60,Math.min(END_H*60,m));}
+function timeToTop(min){return (min-START_H*60)/15*SLOT_H;}
+function topToTime(top){var m=Math.round(top/SLOT_H*15)+START_H*60;return Math.max(START_H*60,Math.min(END_H*60,m));}
 function fmtTime(min){var h=Math.floor(min/60),m=min%60;return h+':'+(m<10?'0':'')+m;}
 
 /* ═══════════════════════════════════════════════════════════
@@ -303,7 +303,7 @@ function renderThreeDay(){
     h+='<div class="timeline" id="tl-'+dt+'" style="position:relative;">';
 
     // Time grid lines + labels
-    for(var t=START_H*60;t<=END_H*60;t+=30){
+    for(var t=START_H*60;t<=END_H*60;t+=15){
       var isHour=(t%60===0);
       h+='<div class="tl-slot'+(isHour?' even':'')+'" style="top:'+timeToTop(t)+'px">';
       if(isHour)h+='<span class="tl-label">'+Math.floor(t/60)+':00</span>';
@@ -332,7 +332,7 @@ function renderThreeDay(){
         var dc=e.status==='done'?'#5ab880':(e.status==='failed'?'#d06868':'#d4a040');
         var pc=e.status==='pending'?' pulse':'';
         var topPx=timeToTop(st);
-        var hPx=Math.max(SLOT_H,(e.duration||30)/30*SLOT_H);
+        var hPx=Math.max(SLOT_H,(e.duration||30)/15*SLOT_H);
         h+='<div class="task-block '+cls+'" style="top:'+topPx+'px;height:'+hPx+'px;" data-entry-id="'+e.id+'" data-date="'+dt+'" data-start="'+st+'" onclick="cycleEntryStatus(this)">';
         h+='<button class="task-del" onclick="event.stopPropagation();deleteEntry(\''+dt+'\',\''+e.id+'\')" title="删除">×</button>';
         h+='<div class="block-inner"><div style="overflow:hidden;">';
@@ -404,7 +404,7 @@ function initDrag(){
     var newTop=parseFloat(block.style.top);
     var newTime=topToTime(newTop);
     // Snap to nearest 30min
-    newTime=Math.round(newTime/30)*30;
+    newTime=Math.round(newTime/15)*15;
     newTime=Math.max(START_H*60,Math.min(END_H*60-30,newTime));
     // Update entry
     var entries=le(dragState.date);
