@@ -9,3 +9,6 @@ venv/
 
 # VS Code配置
 .vscode/
+
+# 可视化助手缓存
+.superpowers/
