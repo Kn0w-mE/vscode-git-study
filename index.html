@@ -340,7 +340,6 @@
   <div class="header">
     <div>
       <div class="app-title" id="appTitle" title="点击修改名称"><span id="titleText">Asuka</span><span class="edit-hint">的Time</span></div>
-      <div class="sub">每日规划 · 仪式感生活</div>
     </div>
     <div class="date-badge" id="dateBadge">📅 加载中...</div>
   </div>
@@ -521,30 +520,37 @@ function renderSummary(period){
   h+='</div>';
 
   // Pie chart card
-  h+='<div class="summary-chart"><h3>分类分布</h3>';
+  var catEntries=Object.entries(cats).sort(function(a,b){return b[1]-a[1];});
+  h+='<div class="summary-chart"><h3>已完成任务 · 分类占比</h3>';
   h+='<canvas id="pieCanvas" width="260" height="260"></canvas>';
   h+='<div class="pie-legend">';
-  var catEntries=Object.entries(cats).sort(function(a,b){return b[1]-a[1];});
-  var pieTotal=doneMin||1;
-  catEntries.forEach(function(e){
-    var pct=Math.round(e[1]/pieTotal*100);
-    h+='<div class="leg-item"><span class="leg-dot" style="background:'+(CAT_COLORS[e[0]]||'#888')+';"></span>'+cn(e[0])+' '+fm(e[1])+' ('+pct+'%)</div>';
-  });
+  if(catEntries.length===0){
+    h+='<div style="color:#6a6a74;font-size:14px;">暂无已完成任务</div>';
+  }else{
+    catEntries.forEach(function(e){
+      var pct=Math.round(e[1]/doneMin*100);
+      h+='<div class="leg-item"><span class="leg-dot" style="background:'+(CAT_COLORS[e[0]]||'#888')+';"></span>'+cn(e[0])+' '+fm(e[1])+' ('+pct+'%)</div>';
+    });
+  }
   h+='</div></div></div>';
   c.innerHTML=h;
 
-  // Draw pie chart — only completed tasks, by category time
+  // Draw pie chart
   setTimeout(function(){
     var pc=document.getElementById('pieCanvas');if(!pc)return;
     var pctx=pc.getContext('2d');
     var cx=130,cy=130,r=115;
     pctx.clearRect(0,0,260,260);
+    if(catEntries.length===0||doneMin===0){
+      pctx.fillStyle='#6a6a74';pctx.font='15px system-ui';pctx.textAlign='center';pctx.textBaseline='middle';
+      pctx.fillText('暂无数据',cx,cy);
+      return;
+    }
     var angle=-Math.PI/2;
     var catColors=['#5aaa7a','#5090c0','#d4a040','#9060b8','#e86868','#60b0a0','#c08050'];
     var ci=0;
-    var pieTotal=doneMin||1;
     catEntries.forEach(function(e){
-      var slice=(e[1]/pieTotal)*Math.PI*2;
+      var slice=(e[1]/doneMin)*Math.PI*2;
       if(slice<0.02)return;
       pctx.beginPath();pctx.moveTo(cx,cy);
       pctx.arc(cx,cy,r,angle,angle+slice);
@@ -553,20 +559,20 @@ function renderSummary(period){
       pctx.fill();
       pctx.strokeStyle='rgba(30,30,40,0.6)';pctx.lineWidth=2.5;pctx.stroke();
       var mid=angle+slice/2;
-      var lx=cx+Math.cos(mid)*r*0.65;
-      var ly=cy+Math.sin(mid)*r*0.65;
-      var pct=Math.round(e[1]/pieTotal*100);
+      var pct=Math.round(e[1]/doneMin*100);
       if(pct>=8){
+        var lx=cx+Math.cos(mid)*r*0.65;
+        var ly=cy+Math.sin(mid)*r*0.65;
         pctx.fillStyle='#fff';pctx.font='bold 12px system-ui';pctx.textAlign='center';pctx.textBaseline='middle';
         pctx.fillText(pct+'%',lx,ly);
       }
       angle+=slice;ci++;
     });
-    pctx.beginPath();pctx.arc(cx,cy,30,0,Math.PI*2);
+    pctx.beginPath();pctx.arc(cx,cy,28,0,Math.PI*2);
     pctx.fillStyle='rgba(40,40,52,0.9)';pctx.fill();
     pctx.fillStyle='#e0e0e8';pctx.font='bold 13px system-ui';pctx.textAlign='center';pctx.textBaseline='middle';
     pctx.fillText(fm(doneMin),cx,cy);
-  },50);
+  },80);
 }
 
 // ═══════════════════════════════════════════════════════════════
