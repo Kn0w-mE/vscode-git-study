@@ -308,7 +308,7 @@ function renderThreeDay(){
     for(var t=START_H*60;t<=END_H*60;t+=15){
       var isHour=(t%60===0),isH2=(t%120===0);
       h+='<div class="tl-slot'+(isH2?' h2':(isHour?' even':''))+'" style="top:'+timeToTop(t)+'px">';
-      if(isHour)h+='<span class="tl-label'+(isH2?' h2':'')+'">'+Math.floor(t/60)+':00</span>';
+      if(isHour){var hh=Math.floor(t/60);if(hh>=24)hh-=24;h+='<span class="tl-label'+(isH2?' h2':'')+'">'+hh+':00</span>';}
       h+='</div>';
     }
 
