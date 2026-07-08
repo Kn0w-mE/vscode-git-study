@@ -5,34 +5,87 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Time Planner</title>
 <style>
-  /* ============================================================
-     RESET & BASE — scaled for 24" monitor (1920×1080)
-     ============================================================ */
   *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+
+  /* ═══════════════════════════════════════════════════════════
+     LAYER 1: BOKEH NIGHT CITY BACKGROUND
+     ═══════════════════════════════════════════════════════════ */
+  .bokeh-layer{
+    position:fixed;inset:-80px;z-index:0;pointer-events:none;
+    filter:blur(40px) brightness(0.45);
+    overflow:hidden;
+    background:#0a0a12;
+  }
+  .bokeh-layer .light{
+    position:absolute;border-radius:50%;
+    animation:lightPulse 6s ease-in-out infinite;
+  }
+  @keyframes lightPulse{
+    0%,100%{opacity:0.6;transform:scale(1)}
+    50%{opacity:1;transform:scale(1.25)}
+  }
+  /* Neon sign bokeh spots — varied colors and sizes */
+  .bokeh-layer .light:nth-child(1){width:180px;height:180px;background:radial-gradient(circle,rgba(255,80,100,0.9),transparent);top:10%;left:8%;animation-delay:0s;}
+  .bokeh-layer .light:nth-child(2){width:120px;height:120px;background:radial-gradient(circle,rgba(100,180,255,0.85),transparent);top:15%;left:25%;animation-delay:-1.5s;}
+  .bokeh-layer .light:nth-child(3){width:100px;height:100px;background:radial-gradient(circle,rgba(255,200,80,0.8),transparent);top:8%;left:45%;animation-delay:-3s;}
+  .bokeh-layer .light:nth-child(4){width:160px;height:160px;background:radial-gradient(circle,rgba(220,100,255,0.75),transparent);top:5%;left:65%;animation-delay:-4.5s;}
+  .bokeh-layer .light:nth-child(5){width:90px;height:90px;background:radial-gradient(circle,rgba(80,220,180,0.8),transparent);top:12%;left:80%;animation-delay:-2s;}
+  .bokeh-layer .light:nth-child(6){width:140px;height:140px;background:radial-gradient(circle,rgba(255,140,80,0.7),transparent);top:25%;left:15%;animation-delay:-5s;}
+  .bokeh-layer .light:nth-child(7){width:110px;height:110px;background:radial-gradient(circle,rgba(130,160,255,0.8),transparent);top:30%;left:55%;animation-delay:-1s;}
+  .bokeh-layer .light:nth-child(8){width:100px;height:100px;background:radial-gradient(circle,rgba(255,100,150,0.75),transparent);top:20%;left:90%;animation-delay:-3.5s;}
+  .bokeh-layer .light:nth-child(9){width:130px;height:130px;background:radial-gradient(circle,rgba(200,200,100,0.7),transparent);top:35%;left:35%;animation-delay:-2.5s;}
+  .bokeh-layer .light:nth-child(10){width:80px;height:80px;background:radial-gradient(circle,rgba(100,255,200,0.75),transparent);top:40%;left:75%;animation-delay:-0.5s;}
+  /* Second row — mid-height */
+  .bokeh-layer .light:nth-child(11){width:150px;height:150px;background:radial-gradient(circle,rgba(255,60,90,0.6),transparent);top:55%;left:5%;animation-delay:-4s;}
+  .bokeh-layer .light:nth-child(12){width:100px;height:100px;background:radial-gradient(circle,rgba(80,150,255,0.7),transparent);top:60%;left:30%;animation-delay:-1.8s;}
+  .bokeh-layer .light:nth-child(13){width:120px;height:120px;background:radial-gradient(circle,rgba(255,180,60,0.65),transparent);top:50%;left:50%;animation-delay:-3.2s;}
+  .bokeh-layer .light:nth-child(14){width:90px;height:90px;background:radial-gradient(circle,rgba(200,80,220,0.7),transparent);top:58%;left:70%;animation-delay:-0.8s;}
+  .bokeh-layer .light:nth-child(15){width:140px;height:140px;background:radial-gradient(circle,rgba(60,200,180,0.6),transparent);top:52%;left:88%;animation-delay:-2.2s;}
+  /* Third row — bottom */
+  .bokeh-layer .light:nth-child(16){width:110px;height:110px;background:radial-gradient(circle,rgba(255,120,100,0.55),transparent);top:75%;left:12%;animation-delay:-1.2s;}
+  .bokeh-layer .light:nth-child(17){width:90px;height:90px;background:radial-gradient(circle,rgba(100,180,255,0.6),transparent);top:80%;left:40%;animation-delay:-4.8s;}
+  .bokeh-layer .light:nth-child(18){width:130px;height:130px;background:radial-gradient(circle,rgba(255,200,100,0.55),transparent);top:70%;left:60%;animation-delay:-2.8s;}
+  .bokeh-layer .light:nth-child(19){width:100px;height:100px;background:radial-gradient(circle,rgba(180,100,240,0.6),transparent);top:78%;left:82%;animation-delay:-0.3s;}
+  .bokeh-layer .light:nth-child(20){width:120px;height:120px;background:radial-gradient(circle,rgba(80,220,200,0.5),transparent);top:85%;left:25%;animation-delay:-3.8s;}
+
+  /* Tiny distant city lights — dense grid of small dots */
+  .bokeh-layer .tiny{position:absolute;border-radius:50%;background:rgba(255,255,255,0.7);animation:tinyFlicker 3s ease-in-out infinite;}
+  @keyframes tinyFlicker{
+    0%,100%{opacity:0.4}
+    33%{opacity:0.9}
+    66%{opacity:0.5}
+  }
+
+  /* ═══════════════════════════════════════════════════════════
+     LAYER 2: RAIN CANVAS
+     ═══════════════════════════════════════════════════════════ */
+  #rainCanvas{
+    position:fixed;inset:0;z-index:1;pointer-events:none;
+    mix-blend-mode:overlay;
+  }
+
+  /* ═══════════════════════════════════════════════════════════
+     BASE — dark mode
+     ═══════════════════════════════════════════════════════════ */
   body{
-    min-height:100vh; width:100vw;
+    min-height:100vh;width:100vw;
     display:flex;align-items:flex-start;justify-content:center;
     font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Segoe UI','PingFang SC','Microsoft YaHei',sans-serif;
-    color:#1d1d1f;
+    color:#e8e8ed;
     -webkit-font-smoothing:antialiased;
     -moz-osx-font-smoothing:grayscale;
     overflow-x:hidden;
     position:relative;
-    background:#f2f1f6;
+    background:#0a0a12;
     padding:32px 40px;
   }
   @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@700;800&display=swap');
 
   /* ═══════════════════════════════════════════════════════════
-     RAINDROP CANVAS BACKGROUND
+     LAYER 3: UI SCENE
      ═══════════════════════════════════════════════════════════ */
-  #rainCanvas{position:fixed;inset:0;z-index:0;pointer-events:none;}
-
-  /* ============================================================
-     SCENE — full 24" width
-     ============================================================ */
   .scene{
-    position:relative;z-index:1;
+    position:relative;z-index:2;
     width:1500px;max-width:100%;
     padding:48px 24px 36px;
   }
@@ -44,64 +97,64 @@
   }
   .app-title{
     font-family:'JetBrains Mono','SF Mono','Consolas','Courier New',monospace;
-    font-size:36px;font-weight:800;color:#1d1d1f;letter-spacing:-0.8px;
+    font-size:36px;font-weight:800;color:#f0f0f5;letter-spacing:-0.8px;
     cursor:pointer;position:relative;
     padding:6px 12px;margin:-6px -12px;
     border-radius:12px;
     transition:background 0.2s;
     display:inline-flex;align-items:baseline;gap:2px;
   }
-  .app-title:hover{background:rgba(0,0,0,0.03);}
+  .app-title:hover{background:rgba(255,255,255,0.06);}
   .app-title input{
     font-family:inherit;font-size:inherit;font-weight:inherit;
     color:inherit;letter-spacing:inherit;
     border:none;outline:none;background:transparent;
     width:auto;min-width:140px;
-    border-bottom:2px solid rgba(0,120,220,0.4);
+    border-bottom:2px solid rgba(100,180,255,0.5);
     padding:0;
   }
   .app-title .edit-hint{
-    font-size:13px;font-weight:400;color:#86868b;
+    font-size:13px;font-weight:400;color:#8e8e9a;
     font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Segoe UI',sans-serif;
     opacity:0;transition:opacity 0.2s;
   }
   .app-title:hover .edit-hint{opacity:1;}
-  .header .sub{font-size:15px;color:#86868b;margin-top:4px;font-weight:400;}
+  .header .sub{font-size:15px;color:#7c7c86;margin-top:4px;font-weight:400;}
   .date-badge{
-    background:rgba(255,255,255,0.45);
-    backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);
-    border:1px solid rgba(255,255,255,0.65);
+    background:rgba(60,60,70,0.45);
+    backdrop-filter:blur(30px);-webkit-backdrop-filter:blur(30px);
+    border:1px solid rgba(255,255,255,0.1);
     border-radius:32px;padding:14px 28px;
-    font-size:16px;color:#3a3a3c;
-    box-shadow:0 2px 20px rgba(0,0,0,0.04);
+    font-size:16px;color:#c8c8d2;
+    box-shadow:0 2px 20px rgba(0,0,0,0.3);
   }
 
   /* ── Tab Capsule ── */
   .tab-capsule{
     display:inline-flex;gap:3px;flex-wrap:wrap;
-    background:rgba(255,255,255,0.35);
-    backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
-    border:1px solid rgba(255,255,255,0.55);
+    background:rgba(50,50,60,0.4);
+    backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);
+    border:1px solid rgba(255,255,255,0.08);
     border-radius:36px;padding:6px;
     margin-bottom:42px;
-    box-shadow:0 2px 20px rgba(0,0,0,0.04);
+    box-shadow:0 2px 20px rgba(0,0,0,0.3);
   }
   .tab-capsule .tab{
     padding:13px 28px;border-radius:30px;font-size:16px;font-weight:500;
     cursor:pointer;transition:all 0.35s cubic-bezier(0.23,1,0.32,1);
-    color:#86868b;background:transparent;
+    color:#7c7c86;background:transparent;
     border:1px solid transparent;user-select:none;
     position:relative;
   }
   .tab-capsule .tab.active{
-    background:#fff;
-    color:#1d1d1f;
-    border-color:rgba(0,0,0,0.05);
-    box-shadow:0 2px 10px rgba(0,0,0,0.07),0 1px 4px rgba(0,0,0,0.05);
+    background:rgba(70,70,82,0.7);
+    color:#f0f0f5;
+    border-color:rgba(255,255,255,0.1);
+    box-shadow:0 2px 10px rgba(0,0,0,0.3);
   }
   .tab-capsule .tab:hover:not(.active){
-    color:#3a3a3c;
-    background:rgba(255,255,255,0.5);
+    color:#b0b0b8;
+    background:rgba(255,255,255,0.05);
   }
 
   /* ═══════════════════════════════════════════════════════════
@@ -119,70 +172,69 @@
   }
   @media(max-width:1100px){.grid-3d{grid-template-columns:1fr;}}
 
-  /* ── Apple Glass Card ── */
+  /* ── Gray Glass Card ── */
   .day-card{
     position:relative;
     perspective:1200px;
     transform-style:preserve-3d;
-    background:rgba(255,255,255,0.28);
-    backdrop-filter:blur(40px) saturate(180%);
-    -webkit-backdrop-filter:blur(40px) saturate(180%);
+    background:rgba(55,55,68,0.4);
+    backdrop-filter:blur(40px) saturate(140%);
+    -webkit-backdrop-filter:blur(40px) saturate(140%);
     border-radius:32px;
     padding:32px;
-    border:1px solid rgba(255,255,255,0.55);
+    border:1px solid rgba(255,255,255,0.08);
     box-shadow:
-      0 8px 24px rgba(0,0,0,0.03),
-      0 30px 70px rgba(0,0,0,0.04),
-      0 60px 120px rgba(31,38,135,0.04),
-      inset 0 1px 0 rgba(255,255,255,0.65);
+      0 8px 24px rgba(0,0,0,0.25),
+      0 30px 70px rgba(0,0,0,0.3),
+      0 60px 120px rgba(0,0,0,0.25),
+      inset 0 1px 0 rgba(255,255,255,0.06);
     transition:
       box-shadow 0.5s cubic-bezier(0.23,1,0.32,1),
-      border-color 0.5s ease;
+      border-color 0.5s ease,
+      transform 0.5s cubic-bezier(0.23,1,0.32,1);
     cursor:default;
     overflow:hidden;
   }
+  /* Sheen — much subtler now, won't obscure text */
   .day-card::before{
     content:'';
     position:absolute;inset:0;z-index:4;pointer-events:none;
     border-radius:32px;
     background:linear-gradient(
       115deg,
-      transparent 30%,
-      rgba(255,255,255,0.12) 42%,
-      rgba(255,255,255,0.4) 46%,
-      rgba(255,255,255,0.5) 50%,
-      rgba(255,255,255,0.4) 54%,
-      rgba(255,255,255,0.12) 58%,
-      transparent 70%
+      transparent 35%,
+      rgba(255,255,255,0.04) 45%,
+      rgba(255,255,255,0.08) 50%,
+      rgba(255,255,255,0.04) 55%,
+      transparent 65%
     );
     background-size:200% 200%;
     background-position:200% 50%;
     opacity:0;
-    transition:
-      opacity 0.35s ease,
-      background-position 0.6s cubic-bezier(0.23,1,0.32,1);
+    transition:opacity 0.4s ease,background-position 0.6s cubic-bezier(0.23,1,0.32,1);
   }
   .day-card:hover::before{
     opacity:1;
-    background-position:-100% 50%;
+    background-position:-80% 50%;
   }
   .day-card:hover{
-    border-color:rgba(255,255,255,0.75);
+    border-color:rgba(255,255,255,0.14);
+    transform:translateY(-4px);
     box-shadow:
-      0 12px 32px rgba(0,0,0,0.04),
-      0 40px 80px rgba(0,0,0,0.06),
-      0 70px 140px rgba(31,38,135,0.06),
-      inset 0 1px 0 rgba(255,255,255,0.75);
+      0 12px 32px rgba(0,0,0,0.3),
+      0 40px 80px rgba(0,0,0,0.35),
+      0 70px 140px rgba(0,0,0,0.3),
+      inset 0 1px 0 rgba(255,255,255,0.1);
   }
   .day-card.today{
-    background:rgba(255,255,255,0.35);
-    border-color:rgba(120,160,230,0.35);
+    background:rgba(65,65,80,0.5);
+    border-color:rgba(120,160,230,0.2);
     box-shadow:
-      0 8px 28px rgba(0,0,0,0.03),
-      0 30px 70px rgba(80,110,190,0.05),
-      0 60px 120px rgba(80,110,190,0.06),
-      0 0 0 1px rgba(120,160,230,0.08),
-      inset 0 1px 0 rgba(255,255,255,0.7);
+      0 8px 28px rgba(0,0,0,0.25),
+      0 30px 70px rgba(80,110,190,0.12),
+      0 60px 120px rgba(80,110,190,0.1),
+      0 0 0 1px rgba(120,160,230,0.06),
+      inset 0 1px 0 rgba(255,255,255,0.08);
   }
 
   .card-tilt-surface{
@@ -195,9 +247,9 @@
   .day-label{
     font-size:13px;text-transform:uppercase;letter-spacing:2.5px;
     margin-bottom:22px;font-weight:600;
-    color:#98989e;
+    color:#888892;
   }
-  .day-card.today .day-label{color:#5a6faa;}
+  .day-card.today .day-label{color:#88a4d0;}
 
   /* ── Recessed Task Block ── */
   .task-block{
@@ -208,48 +260,48 @@
   .task-block .block-inner{
     position:relative;border-radius:18px;padding:18px 22px;
     display:flex;justify-content:space-between;align-items:flex-start;
-    background:rgba(255,255,255,0.38);
-    border:1px solid rgba(255,255,255,0.45);
+    background:rgba(255,255,255,0.04);
+    border:1px solid rgba(255,255,255,0.06);
     box-shadow:
-      inset 0 2px 8px rgba(0,0,0,0.04),
-      inset 0 1px 3px rgba(0,0,0,0.03);
+      inset 0 2px 8px rgba(0,0,0,0.2),
+      inset 0 1px 3px rgba(0,0,0,0.15);
     transition:all 0.35s cubic-bezier(0.23,1,0.32,1);
   }
   .task-block:hover{transform:translateY(-3px);}
   .task-block:hover .block-inner{
-    background:rgba(255,255,255,0.6);
-    border-color:rgba(255,255,255,0.75);
+    background:rgba(255,255,255,0.08);
+    border-color:rgba(255,255,255,0.14);
     box-shadow:
-      inset 0 2px 6px rgba(0,0,0,0.03),
-      0 6px 20px rgba(0,0,0,0.05);
+      inset 0 2px 6px rgba(0,0,0,0.15),
+      0 6px 20px rgba(0,0,0,0.3);
   }
   .task-block.done .block-inner{
-    background:rgba(235,248,238,0.5);
-    border-color:rgba(170,215,180,0.42);
-    box-shadow:inset 0 2px 8px rgba(80,150,100,0.06),inset 0 1px 3px rgba(80,150,100,0.04);
+    background:rgba(80,180,120,0.1);
+    border-color:rgba(100,200,140,0.15);
+    box-shadow:inset 0 2px 8px rgba(80,150,100,0.12),inset 0 1px 3px rgba(80,150,100,0.08);
   }
   .task-block.failed .block-inner{
-    background:rgba(252,240,240,0.5);
-    border-color:rgba(225,180,180,0.38);
-    box-shadow:inset 0 2px 8px rgba(180,80,80,0.06),inset 0 1px 3px rgba(180,80,80,0.04);
+    background:rgba(210,90,90,0.1);
+    border-color:rgba(220,120,120,0.12);
+    box-shadow:inset 0 2px 8px rgba(180,80,80,0.12),inset 0 1px 3px rgba(180,80,80,0.08);
   }
   .task-block.pending .block-inner{
-    background:rgba(250,245,235,0.5);
-    border-color:rgba(215,195,155,0.38);
-    box-shadow:inset 0 2px 8px rgba(170,140,60,0.06),inset 0 1px 3px rgba(170,140,60,0.04);
+    background:rgba(200,160,70,0.08);
+    border-color:rgba(210,175,85,0.12);
+    box-shadow:inset 0 2px 8px rgba(170,140,60,0.1),inset 0 1px 3px rgba(170,140,60,0.06);
   }
 
-  .task-name{font-size:17px;font-weight:600;color:#1d1d1f;display:flex;align-items:center;gap:8px;}
+  .task-name{font-size:17px;font-weight:600;color:#e0e0e8;display:flex;align-items:center;gap:8px;}
   .task-meta{font-size:13px;margin-top:4px;}
   .task-duration{
     font-size:14px;font-weight:600;padding:5px 12px;border-radius:14px;
-    background:rgba(0,0,0,0.025);color:#4a4a4e;
+    background:rgba(255,255,255,0.04);color:#a0a0aa;
   }
   .task-dot{
     display:inline-block;width:8px;height:8px;border-radius:50%;
   }
   .task-dot.pulse{animation:dot-pulse 2s ease-in-out infinite;}
-  @keyframes dot-pulse{0%,100%{opacity:0.5;transform:scale(1)}50%{opacity:1;transform:scale(1.5)}}
+  @keyframes dot-pulse{0%,100%{opacity:0.4;transform:scale(1)}50%{opacity:1;transform:scale(1.5)}}
 
   /* Idle gap */
   .idle-gap{
@@ -258,21 +310,21 @@
   }
   .idle-gap .line{
     flex:1;height:1px;
-    background:linear-gradient(90deg,transparent,rgba(0,0,0,0.05),transparent);
+    background:linear-gradient(90deg,transparent,rgba(255,255,255,0.05),transparent);
   }
-  .idle-gap span{font-size:12px;color:#aeaeb2;white-space:nowrap;}
+  .idle-gap span{font-size:12px;color:#6a6a74;white-space:nowrap;}
 
   /* Add block */
   .add-block{
-    border:1.5px dashed rgba(0,0,0,0.08);
+    border:1.5px dashed rgba(255,255,255,0.08);
     border-radius:18px;padding:18px;text-align:center;
-    font-size:15px;color:#aeaeb2;cursor:pointer;z-index:1;position:relative;
+    font-size:15px;color:#6a6a74;cursor:pointer;z-index:1;position:relative;
     transition:all 0.4s ease;
   }
   .add-block:hover{
-    border-color:rgba(0,120,220,0.3);color:#6a6a6e;
-    background:rgba(255,255,255,0.4);
-    box-shadow:0 4px 20px rgba(0,120,220,0.06);
+    border-color:rgba(100,180,255,0.25);color:#888892;
+    background:rgba(255,255,255,0.03);
+    box-shadow:0 4px 20px rgba(100,180,255,0.04);
   }
 
   /* ── Buttons ── */
@@ -284,28 +336,28 @@
     position:relative;overflow:hidden;
   }
   .btn-done{
-    background:rgba(235,248,238,0.65);color:#2e6b3a;
-    border:1px solid rgba(170,215,180,0.45);
+    background:rgba(80,180,120,0.12);color:#8ce0a8;
+    border:1px solid rgba(100,200,140,0.15);
   }
   .btn-done:hover{
-    background:rgba(220,240,225,0.9);
-    box-shadow:0 8px 28px rgba(70,150,90,0.14);
-    border-color:rgba(140,205,155,0.55);
+    background:rgba(80,180,120,0.22);
+    box-shadow:0 8px 28px rgba(70,150,90,0.15);
+    border-color:rgba(100,200,140,0.3);
     transform:translateY(-2px);
   }
   .btn-fail{
-    background:rgba(252,242,242,0.6);color:#7a3a3a;
-    border:1px solid rgba(225,180,180,0.4);
+    background:rgba(210,90,90,0.1);color:#e89898;
+    border:1px solid rgba(220,120,120,0.12);
   }
   .btn-fail:hover{
-    background:rgba(248,228,228,0.85);
-    box-shadow:0 8px 28px rgba(190,70,70,0.12);
-    border-color:rgba(210,150,150,0.5);
+    background:rgba(210,90,90,0.2);
+    box-shadow:0 8px 28px rgba(190,70,70,0.15);
+    border-color:rgba(220,120,120,0.25);
     transform:translateY(-2px);
   }
   .btn .ripple{
     position:absolute;border-radius:50%;
-    background:rgba(0,120,220,0.15);
+    background:rgba(255,255,255,0.1);
     transform:scale(0);animation:ripple-out 0.6s ease-out forwards;
     pointer-events:none;
   }
@@ -313,7 +365,7 @@
 
   .card-summary{
     font-size:13px;text-align:center;margin-top:18px;
-    color:#98989e;position:relative;z-index:1;
+    color:#787880;position:relative;z-index:1;
   }
 
   /* ═══════════════════════════════════════════════════════════
@@ -324,115 +376,130 @@
     gap:20px;padding:0 12px;
   }
   .lib-block{
-    background:rgba(255,255,255,0.32);
+    background:rgba(55,55,68,0.38);
     backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);
-    border:1px solid rgba(255,255,255,0.55);
+    border:1px solid rgba(255,255,255,0.08);
     border-radius:24px;padding:22px;
-    box-shadow:0 12px 40px rgba(0,0,0,0.03),inset 0 1px 0 rgba(255,255,255,0.55);
+    box-shadow:0 12px 40px rgba(0,0,0,0.2),inset 0 1px 0 rgba(255,255,255,0.05);
     cursor:pointer;transition:all 0.3s ease;
     position:relative;
   }
   .lib-block:hover{
     transform:translateY(-3px);
-    box-shadow:0 20px 50px rgba(0,0,0,0.06),inset 0 1px 0 rgba(255,255,255,0.65);
-    border-color:rgba(255,255,255,0.75);
+    box-shadow:0 20px 50px rgba(0,0,0,0.3),inset 0 1px 0 rgba(255,255,255,0.08);
+    border-color:rgba(255,255,255,0.14);
   }
-  .lib-block .block-name{font-size:18px;font-weight:600;color:#1d1d1f;margin-bottom:8px;}
-  .lib-block .block-info{font-size:14px;color:#86868b;display:flex;gap:14px;flex-wrap:wrap;}
+  .lib-block .block-name{font-size:18px;font-weight:600;color:#e8e8ed;margin-bottom:8px;}
+  .lib-block .block-info{font-size:14px;color:#7c7c86;display:flex;gap:14px;flex-wrap:wrap;}
   .lib-block .block-actions{display:flex;gap:8px;margin-top:12px;}
   .lib-block .block-actions button{
     padding:6px 14px;border-radius:12px;font-size:12px;cursor:pointer;
-    border:1px solid rgba(0,0,0,0.08);background:rgba(255,255,255,0.5);
-    color:#4a4a4e;transition:all 0.2s;
+    border:1px solid rgba(255,255,255,0.08);background:rgba(255,255,255,0.04);
+    color:#a0a0aa;transition:all 0.2s;
   }
-  .lib-block .block-actions button:hover{background:rgba(255,255,255,0.8);}
-  .lib-block .block-actions button.danger{color:#c85050;}
-  .lib-block .block-actions button.danger:hover{background:rgba(255,225,225,0.8);}
+  .lib-block .block-actions button:hover{background:rgba(255,255,255,0.1);}
+  .lib-block .block-actions button.danger{color:#e08080;}
+  .lib-block .block-actions button.danger:hover{background:rgba(220,100,100,0.15);}
 
   .add-lib-block{
-    border:2px dashed rgba(0,0,0,0.08);
+    border:2px dashed rgba(255,255,255,0.08);
     border-radius:24px;padding:28px;text-align:center;
-    font-size:16px;color:#aeaeb2;cursor:pointer;
+    font-size:16px;color:#6a6a74;cursor:pointer;
     transition:all 0.4s ease;
     display:flex;align-items:center;justify-content:center;
     min-height:160px;
   }
   .add-lib-block:hover{
-    border-color:rgba(0,120,220,0.3);color:#6a6a6e;
-    background:rgba(255,255,255,0.3);
+    border-color:rgba(100,180,255,0.25);color:#888892;
+    background:rgba(255,255,255,0.03);
   }
 
   /* ═══════════════════════════════════════════════════════════
-     SEVEN-DAY & WEEKLY VIEW
+     SEVEN-DAY & WEEKLY VIEW — richer detail
      ═══════════════════════════════════════════════════════════ */
   .overview-grid{
     display:grid;grid-template-columns:repeat(7,1fr);gap:16px;padding:0 12px;
   }
   @media(max-width:1100px){.overview-grid{grid-template-columns:repeat(4,1fr);}}
   .overview-day{
-    background:rgba(255,255,255,0.28);
+    background:rgba(55,55,68,0.38);
     backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);
-    border:1px solid rgba(255,255,255,0.55);
-    border-radius:22px;padding:20px;
+    border:1px solid rgba(255,255,255,0.08);
+    border-radius:22px;padding:22px;
     text-align:center;
-    box-shadow:0 12px 40px rgba(0,0,0,0.03),inset 0 1px 0 rgba(255,255,255,0.55);
+    box-shadow:0 12px 40px rgba(0,0,0,0.2),inset 0 1px 0 rgba(255,255,255,0.05);
+    transition:all 0.3s ease;
   }
-  .overview-day .dow{font-size:12px;color:#86868b;margin-bottom:6px;}
-  .overview-day .date{font-size:22px;font-weight:700;color:#1d1d1f;}
-  .overview-day .done-count{font-size:15px;color:#4a9a5a;margin-top:6px;}
-  .overview-day .fail-count{font-size:15px;color:#c85050;}
-  .overview-day .total-hours{font-size:12px;color:#aeaeb2;margin-top:6px;}
+  .overview-day:hover{
+    transform:translateY(-2px);
+    border-color:rgba(255,255,255,0.14);
+    box-shadow:0 16px 48px rgba(0,0,0,0.3),inset 0 1px 0 rgba(255,255,255,0.08);
+  }
+  .overview-day .dow{font-size:12px;color:#7c7c86;margin-bottom:6px;}
+  .overview-day .date-num{font-size:24px;font-weight:700;color:#e0e0e8;margin-bottom:10px;}
+  .overview-day .stat-row{display:flex;justify-content:center;gap:12px;margin-bottom:6px;}
+  .overview-day .stat-item{font-size:13px;}
+  .overview-day .stat-item.done{color:#8ce0a8;}
+  .overview-day .stat-item.fail{color:#e89898;}
+  .overview-day .stat-item.pend{color:#c8a860;}
+  .overview-day .total-hours{font-size:12px;color:#6a6a74;margin-top:4px;}
+  .overview-day .cat-tags{display:flex;flex-wrap:wrap;gap:3px;justify-content:center;margin-top:8px;}
+  .overview-day .cat-tag{
+    font-size:9px;padding:2px 6px;border-radius:8px;
+    background:rgba(255,255,255,0.05);color:#888892;
+  }
 
   .stat-bar{
     height:5px;border-radius:3px;margin-top:10px;overflow:hidden;display:flex;
   }
-  .stat-bar .done{background:linear-gradient(90deg,#a5d6a7,#66bb6a);}
-  .stat-bar .failed{background:linear-gradient(90deg,#ef9a9a,#e57373);}
-  .stat-bar .empty{background:rgba(0,0,0,0.04);flex:1;}
+  .stat-bar .done{background:linear-gradient(90deg,#6aaa80,#4a9a5a);}
+  .stat-bar .failed{background:linear-gradient(90deg,#c88080,#b05050);}
+  .stat-bar .empty{background:rgba(255,255,255,0.03);flex:1;}
 
   /* Weekly summary */
   .week-summary-card{
-    background:rgba(255,255,255,0.28);
+    background:rgba(55,55,68,0.38);
     backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);
-    border:1px solid rgba(255,255,255,0.55);
+    border:1px solid rgba(255,255,255,0.08);
     border-radius:24px;padding:28px;
-    box-shadow:0 12px 40px rgba(0,0,0,0.03),inset 0 1px 0 rgba(255,255,255,0.55);
+    box-shadow:0 12px 40px rgba(0,0,0,0.2),inset 0 1px 0 rgba(255,255,255,0.05);
     margin-bottom:20px;
   }
-  .week-summary-card h3{font-size:18px;font-weight:600;margin-bottom:14px;color:#1d1d1f;}
+  .week-summary-card h3{font-size:18px;font-weight:600;margin-bottom:14px;color:#e0e0e8;}
 
   /* ═══════════════════════════════════════════════════════════
      MODAL
      ═══════════════════════════════════════════════════════════ */
   .modal-overlay{
     position:fixed;inset:0;z-index:100;
-    background:rgba(0,0,0,0.12);
+    background:rgba(0,0,0,0.4);
     backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);
     display:flex;align-items:center;justify-content:center;
     animation:fadeIn 0.2s ease;
   }
   @keyframes fadeIn{from{opacity:0}to{opacity:1}}
   .modal{
-    background:rgba(255,255,255,0.72);
+    background:rgba(60,60,72,0.75);
     backdrop-filter:blur(36px);-webkit-backdrop-filter:blur(36px);
-    border:1px solid rgba(255,255,255,0.75);
+    border:1px solid rgba(255,255,255,0.1);
     border-radius:28px;padding:32px;
     width:480px;max-width:92vw;max-height:82vh;overflow-y:auto;
-    box-shadow:0 40px 100px rgba(0,0,0,0.1),inset 0 1px 0 rgba(255,255,255,0.65);
+    box-shadow:0 40px 100px rgba(0,0,0,0.4),inset 0 1px 0 rgba(255,255,255,0.06);
   }
-  .modal h3{font-size:22px;font-weight:600;margin-bottom:22px;color:#1d1d1f;}
-  .modal label{display:block;font-size:12px;font-weight:600;color:#86868b;margin-bottom:5px;margin-top:14px;text-transform:uppercase;letter-spacing:1px;}
+  .modal h3{font-size:22px;font-weight:600;margin-bottom:22px;color:#e8e8ed;}
+  .modal label{display:block;font-size:12px;font-weight:600;color:#7c7c86;margin-bottom:5px;margin-top:14px;text-transform:uppercase;letter-spacing:1px;}
   .modal input,.modal select,.modal textarea{
     width:100%;padding:12px 16px;border-radius:14px;
-    border:1px solid rgba(0,0,0,0.1);
-    background:rgba(255,255,255,0.5);
-    font-size:15px;font-family:inherit;
+    border:1px solid rgba(255,255,255,0.1);
+    background:rgba(255,255,255,0.05);
+    font-size:15px;font-family:inherit;color:#e8e8ed;
     transition:all 0.2s;
   }
   .modal input:focus,.modal select:focus,.modal textarea:focus{
-    outline:none;border-color:rgba(0,120,220,0.45);
-    box-shadow:0 0 0 4px rgba(0,120,220,0.08);
+    outline:none;border-color:rgba(100,180,255,0.35);
+    box-shadow:0 0 0 4px rgba(100,180,255,0.06);
   }
+  .modal select option{background:#3a3a48;color:#e8e8ed;}
   .modal textarea{resize:vertical;min-height:70px;}
   .modal .modal-actions{display:flex;gap:12px;margin-top:24px;}
   .modal .modal-actions button{
@@ -440,67 +507,87 @@
     cursor:pointer;border:none;transition:all 0.3s ease;
   }
   .modal .btn-primary{
-    background:rgba(0,120,220,0.12);color:#0066cc;
-    border:1px solid rgba(0,120,220,0.25);
+    background:rgba(100,180,255,0.12);color:#88bff0;
+    border:1px solid rgba(100,180,255,0.2);
   }
   .modal .btn-primary:hover{
-    background:rgba(0,120,220,0.2);transform:translateY(-1px);
+    background:rgba(100,180,255,0.2);transform:translateY(-1px);
   }
   .modal .btn-cancel{
-    background:rgba(0,0,0,0.03);color:#86868b;
-    border:1px solid rgba(0,0,0,0.06);
+    background:rgba(255,255,255,0.03);color:#7c7c86;
+    border:1px solid rgba(255,255,255,0.06);
   }
-  .modal .btn-cancel:hover{background:rgba(0,0,0,0.06);}
+  .modal .btn-cancel:hover{background:rgba(255,255,255,0.06);}
 
   /* Picker */
   .picker-list{max-height:360px;overflow-y:auto;}
   .picker-item{
     padding:16px;border-radius:14px;cursor:pointer;
-    border:1px solid rgba(0,0,0,0.05);margin-bottom:10px;
-    background:rgba(255,255,255,0.42);
+    border:1px solid rgba(255,255,255,0.05);margin-bottom:10px;
+    background:rgba(255,255,255,0.03);
     transition:all 0.2s;
     display:flex;justify-content:space-between;align-items:center;
   }
   .picker-item:hover{
-    background:rgba(255,255,255,0.75);
-    border-color:rgba(0,120,220,0.3);
+    background:rgba(255,255,255,0.08);
+    border-color:rgba(100,180,255,0.2);
   }
-  .picker-item .pick-name{font-weight:600;font-size:15px;}
-  .picker-item .pick-dur{font-size:13px;color:#86868b;}
+  .picker-item .pick-name{font-weight:600;font-size:15px;color:#e0e0e8;}
+  .picker-item .pick-dur{font-size:13px;color:#7c7c86;}
 
   /* Footer */
   .footer{
     display:flex;justify-content:space-between;align-items:center;
     margin-top:40px;padding:20px 12px 0;
-    border-top:1px solid rgba(0,0,0,0.05);
-    font-size:13px;color:#98989e;flex-wrap:wrap;gap:10px;
+    border-top:1px solid rgba(255,255,255,0.05);
+    font-size:13px;color:#6a6a74;flex-wrap:wrap;gap:10px;
   }
   .footer .status-dot{
     display:inline-block;width:7px;height:7px;border-radius:50%;
     background:#4a9a5a;margin-right:7px;
-    box-shadow:0 0 8px rgba(74,154,90,0.35);
+    box-shadow:0 0 8px rgba(74,154,90,0.4);
     animation:dot-pulse 2.5s ease-in-out infinite;
   }
   .footer button{
     padding:8px 16px;border-radius:14px;font-size:12px;cursor:pointer;
-    border:1px solid rgba(0,0,0,0.08);background:rgba(255,255,255,0.45);
-    color:#4a4a4e;transition:all 0.2s;
+    border:1px solid rgba(255,255,255,0.08);background:rgba(255,255,255,0.03);
+    color:#a0a0aa;transition:all 0.2s;
   }
-  .footer button:hover{background:rgba(255,255,255,0.75);}
+  .footer button:hover{background:rgba(255,255,255,0.08);}
 
   /* Empty state */
-  .empty-state{text-align:center;padding:48px;color:#aeaeb2;}
-  .empty-state .icon{font-size:44px;margin-bottom:10px;}
+  .empty-state{text-align:center;padding:48px;color:#6a6a74;}
+  .empty-state .icon{font-size:44px;margin-bottom:10px;opacity:0.5;}
   .empty-state .msg{font-size:15px;}
 </style>
 </head>
 <body>
 
-<!-- Raindrop canvas -->
+<!-- ═══════════════════════════════════
+     LAYER 1: BOKEH NIGHT CITY
+     ═══════════════════════════════════ -->
+<div class="bokeh-layer">
+  <!-- Large neon bokeh orbs -->
+  <div class="light"></div><div class="light"></div><div class="light"></div>
+  <div class="light"></div><div class="light"></div><div class="light"></div>
+  <div class="light"></div><div class="light"></div><div class="light"></div>
+  <div class="light"></div><div class="light"></div><div class="light"></div>
+  <div class="light"></div><div class="light"></div><div class="light"></div>
+  <div class="light"></div><div class="light"></div><div class="light"></div>
+  <div class="light"></div><div class="light"></div>
+  <!-- Tiny distant city lights -->
+  <div id="tinyLights"></div>
+</div>
+
+<!-- ═══════════════════════════════════
+     LAYER 2: RAIN CANVAS
+     ═══════════════════════════════════ -->
 <canvas id="rainCanvas"></canvas>
 
+<!-- ═══════════════════════════════════
+     LAYER 3: UI SCENE
+     ═══════════════════════════════════ -->
 <div class="scene">
-  <!-- Header -->
   <div class="header">
     <div>
       <div class="app-title" id="appTitle" title="点击修改名称">
@@ -511,7 +598,6 @@
     <div class="date-badge" id="dateBadge">📅 加载中...</div>
   </div>
 
-  <!-- Tabs -->
   <div class="tab-capsule" id="tabs">
     <div class="tab active" data-view="threeDay">📅 三日视图</div>
     <div class="tab" data-view="sevenDay">📊 七日概览</div>
@@ -519,27 +605,22 @@
     <div class="tab" data-view="library">🧱 方块库</div>
   </div>
 
-  <!-- ═══ THREE DAY VIEW ═══ -->
   <div class="view-panel active" id="view-threeDay">
     <div class="grid-3d" id="threeDayGrid"></div>
   </div>
 
-  <!-- ═══ SEVEN DAY VIEW ═══ -->
   <div class="view-panel" id="view-sevenDay">
     <div class="overview-grid" id="sevenDayGrid"></div>
   </div>
 
-  <!-- ═══ WEEKLY VIEW ═══ -->
   <div class="view-panel" id="view-weekly">
     <div id="weeklyContent"></div>
   </div>
 
-  <!-- ═══ BLOCK LIBRARY VIEW ═══ -->
   <div class="view-panel" id="view-library">
     <div class="library-grid" id="libraryGrid"></div>
   </div>
 
-  <!-- Footer -->
   <div class="footer">
     <div>
       <button onclick="exportImage('view-threeDay')">📷 导出三日视图</button>
@@ -549,96 +630,159 @@
   </div>
 </div>
 
-<!-- Modal container -->
 <div id="modalContainer"></div>
 
 <script>
 // ═══════════════════════════════════════════════════════════════
-//  RAINDROP CANVAS — Apple-style water droplets on glass
+//  LAYER 1: GENERATE TINY CITY LIGHTS
+// ═══════════════════════════════════════════════════════════════
+(function(){
+  var container=document.getElementById('tinyLights');
+  if(!container)return;
+  var html='';
+  for(var i=0;i<120;i++){
+    var x=Math.random()*100;var y=Math.random()*100;
+    var s=Math.random()*3+1;
+    var d=Math.random()*4+1;
+    html+='<div class="tiny" style="left:'+x+'%;top:'+y+'%;width:'+s+'px;height:'+s+'px;animation-delay:'+(-Math.random()*3).toFixed(1)+'s;animation-duration:'+(Math.random()*4+2).toFixed(1)+'s;"></div>';
+  }
+  container.innerHTML=html;
+})();
+
+// ═══════════════════════════════════════════════════════════════
+//  LAYER 2: DYNAMIC RAINDROP CANVAS
+//  Two types: static condensation droplets + sliding drops with trails
 // ═══════════════════════════════════════════════════════════════
 (function(){
   var c=document.getElementById('rainCanvas');
   if(!c)return;
   var ctx=c.getContext('2d');
-  var drops=[];
-  var MAX=35;
+  var W,H;
 
-  function resize(){c.width=window.innerWidth;c.height=window.innerHeight;}
-  resize();
-  window.addEventListener('resize',resize);
+  function resize(){W=c.width=window.innerWidth;H=c.height=window.innerHeight;}
+  resize();window.addEventListener('resize',resize);
 
-  function createDrop(y){
+  // Static condensation droplets
+  var staticDrops=[];
+  for(var i=0;i<50;i++){
+    staticDrops.push({
+      x:Math.random()*W,y:Math.random()*H,
+      r:Math.random()*2.5+0.8,
+      alpha:Math.random()*0.35+0.1,
+      phase:Math.random()*Math.PI*2
+    });
+  }
+
+  // Sliding raindrops
+  var slidingDrops=[];
+  var MAX_SLIDE=18;
+
+  function createSlidingDrop(startY){
     return{
-      x:Math.random()*c.width,
-      y:y!=null?y:Math.random()*c.height*0.3,
-      r:Math.random()*1.2+0.5,
-      growth:0,
-      maxGrowth:Math.random()*1.8+0.8,
-      speed:0,
+      x:Math.random()*W,
+      y:startY!=null?startY:Math.random()*H*0.3-Math.random()*100,
+      r:Math.random()*2+1,
+      speed:Math.random()*1.2+0.4,
+      wobble:Math.random()*0.4-0.2,
       trail:[],
-      life:0
+      maxTrail:Math.floor(Math.random()*20+10)
     };
   }
 
-  // Seed initial drops
-  for(var i=0;i<MAX;i++) drops.push(createDrop(Math.random()*c.height));
+  for(var i=0;i<MAX_SLIDE;i++) slidingDrops.push(createSlidingDrop(Math.random()*H));
 
   function draw(){
-    ctx.clearRect(0,0,c.width,c.height);
+    ctx.clearRect(0,0,W,H);
 
-    // New drops at top
-    if(drops.length<MAX&&Math.random()<0.08) drops.push(createDrop(-5));
+    // Draw static condensation
+    for(var i=0;i<staticDrops.length;i++){
+      var d=staticDrops[i];
+      var flicker=Math.sin(Date.now()*0.001+d.phase)*0.25+0.75;
+      var alpha=d.alpha*flicker;
 
-    for(var i=drops.length-1;i>=0;i--){
-      var d=drops[i];
-      d.life++;
-
-      // Growth phase
-      if(d.growth<d.maxGrowth){
-        d.growth+=0.03;
-      }else{
-        // Slide down when heavy enough
-        d.speed+=0.04;
-        d.y+=d.speed;
-        // Leave trail
-        if(d.speed>0.3) d.trail.push({x:d.x,y:d.y,r:d.r,alpha:0.5});
-      }
-
-      // Draw trail
-      for(var j=d.trail.length-1;j>=0;j--){
-        var t=d.trail[j];
-        t.alpha-=0.015;
-        t.y+=0.3;
-        if(t.alpha<=0){d.trail.splice(j,1);continue;}
-        ctx.beginPath();
-        ctx.arc(t.x,t.y,t.r*0.8,0,Math.PI*2);
-        ctx.fillStyle='rgba(255,255,255,'+(t.alpha*0.4)+')';
-        ctx.fill();
-      }
-
-      // Draw drop
-      var alpha=Math.min(1,d.growth/d.maxGrowth)*0.55;
-      // Drop body — subtle water bead
+      // Drop body
       ctx.beginPath();
-      ctx.arc(d.x,d.y,d.r*d.growth,0,Math.PI*2);
-      var grad=ctx.createRadialGradient(
-        d.x-d.r*0.3,d.y-d.r*0.3,d.r*0.05,
-        d.x,d.y,d.r*d.growth
-      );
-      grad.addColorStop(0,'rgba(255,255,255,'+(alpha+0.2)+')');
-      grad.addColorStop(0.5,'rgba(255,255,255,'+alpha+')');
+      ctx.arc(d.x,d.y,d.r,0,Math.PI*2);
+      var grad=ctx.createRadialGradient(d.x-d.r*0.3,d.y-d.r*0.3,0,d.x,d.y,d.r);
+      grad.addColorStop(0,'rgba(255,255,255,'+(alpha*1.4)+')');
+      grad.addColorStop(0.6,'rgba(255,255,255,'+alpha+')');
       grad.addColorStop(1,'rgba(255,255,255,0)');
       ctx.fillStyle=grad;
       ctx.fill();
 
-      // Tiny highlight — light refraction
+      // Subtle dark edge (refraction)
       ctx.beginPath();
-      ctx.arc(d.x-d.r*0.2,d.y-d.r*0.25,d.r*0.3,0,Math.PI*2);
-      ctx.fillStyle='rgba(255,255,255,'+(alpha*1.3)+')';
+      ctx.arc(d.x,d.y,d.r+0.5,0,Math.PI*2);
+      ctx.strokeStyle='rgba(0,0,0,'+(alpha*0.3)+')';
+      ctx.lineWidth=0.5;
+      ctx.stroke();
+
+      // Highlight
+      ctx.beginPath();
+      ctx.arc(d.x-d.r*0.2,d.y-d.r*0.25,d.r*0.25,0,Math.PI*2);
+      ctx.fillStyle='rgba(255,255,255,'+(alpha*2)+')';
+      ctx.fill();
+    }
+
+    // Draw sliding drops
+    for(var i=slidingDrops.length-1;i>=0;i--){
+      var d=slidingDrops[i];
+
+      // Add trail point
+      d.trail.push({x:d.x,y:d.y,alpha:0.5});
+      if(d.trail.length>d.maxTrail) d.trail.shift();
+
+      // Move with slight wobble
+      d.y+=d.speed;
+      d.x+=d.wobble+Math.sin(d.y*0.01)*0.3;
+
+      // Draw trail
+      if(d.trail.length>1){
+        ctx.beginPath();
+        ctx.moveTo(d.trail[0].x,d.trail[0].y);
+        for(var j=1;j<d.trail.length;j++){
+          ctx.lineTo(d.trail[j].x,d.trail[j].y);
+        }
+        ctx.strokeStyle='rgba(255,255,255,0.12)';
+        ctx.lineWidth=d.r*0.8;
+        ctx.lineCap='round';
+        ctx.stroke();
+
+        // Fade trail points
+        for(var j=0;j<d.trail.length;j++) d.trail[j].alpha-=0.02;
+      }
+
+      // Draw drop
+      ctx.beginPath();
+      // Slight elongation in movement direction
+      ctx.ellipse(d.x,d.y,d.r,d.r*1.3,0,0,Math.PI*2);
+      var grad=ctx.createRadialGradient(d.x-d.r*0.2,d.y-d.r*0.4,0,d.x,d.y,d.r*1.2);
+      grad.addColorStop(0,'rgba(255,255,255,0.7)');
+      grad.addColorStop(0.5,'rgba(255,255,255,0.35)');
+      grad.addColorStop(1,'rgba(255,255,255,0)');
+      ctx.fillStyle=grad;
+      ctx.fill();
+
+      // Dark edge
+      ctx.beginPath();
+      ctx.ellipse(d.x,d.y,d.r+0.6,d.r*1.3+0.3,0,0,Math.PI*2);
+      ctx.strokeStyle='rgba(0,0,0,0.2)';
+      ctx.lineWidth=0.5;
+      ctx.stroke();
+
+      // Highlight
+      ctx.beginPath();
+      ctx.arc(d.x-d.r*0.15,d.y-d.r*0.4,d.r*0.2,0,Math.PI*2);
+      ctx.fillStyle='rgba(255,255,255,0.9)';
       ctx.fill();
 
       // Remove if off screen
-      if(d.y>c.height+20){drops.splice(i,1);}
+      if(d.y>H+30){slidingDrops.splice(i,1);}
+    }
+
+    // Spawn new sliding drops
+    if(slidingDrops.length<MAX_SLIDE&&Math.random()<0.06){
+      slidingDrops.push(createSlidingDrop(-10-Math.random()*30));
     }
 
     requestAnimationFrame(draw);
@@ -649,60 +793,35 @@
 // ═══════════════════════════════════════════════════════════════
 //  DATA LAYER
 // ═══════════════════════════════════════════════════════════════
-const STORAGE_KEY_BLOCKS = 'timeplanner_blocks';
-const STORAGE_KEY_USERNAME = 'timeplanner_username';
-const STORAGE_KEY_ENTRIES = 'timeplanner_entries'; // key: date
+var STORAGE_KEY_BLOCKS='timeplanner_blocks';
+var STORAGE_KEY_USERNAME='timeplanner_username';
+var STORAGE_KEY_ENTRIES='timeplanner_entries';
+var blocks,username,currentView='threeDay';
 
 function loadBlocks(){
-  try{return JSON.parse(localStorage.getItem(STORAGE_KEY_BLOCKS))||[];}
-  catch(e){return[];}
+  try{return JSON.parse(localStorage.getItem(STORAGE_KEY_BLOCKS))||[];}catch(e){return[];}
 }
-function saveBlocks(blocks){
-  localStorage.setItem(STORAGE_KEY_BLOCKS,JSON.stringify(blocks));
-}
-function loadUsername(){
-  return localStorage.getItem(STORAGE_KEY_USERNAME)||'Asuka';
-}
-function saveUsername(name){
-  localStorage.setItem(STORAGE_KEY_USERNAME,name);
-}
+function saveBlocks(b){localStorage.setItem(STORAGE_KEY_BLOCKS,JSON.stringify(b));}
+function loadUsername(){return localStorage.getItem(STORAGE_KEY_USERNAME)||'Asuka';}
+function saveUsername(n){localStorage.setItem(STORAGE_KEY_USERNAME,n);}
 function loadEntries(date){
-  try{return JSON.parse(localStorage.getItem(STORAGE_KEY_ENTRIES+'_'+date))||[];}
-  catch(e){return[];}
+  try{return JSON.parse(localStorage.getItem(STORAGE_KEY_ENTRIES+'_'+date))||[];}catch(e){return[];}
 }
 function saveEntries(date,entries){
   localStorage.setItem(STORAGE_KEY_ENTRIES+'_'+date,JSON.stringify(entries));
 }
-
 function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2,7);}
 
-// ═══════════════════════════════════════════════════════════════
-//  APP STATE
-// ═══════════════════════════════════════════════════════════════
-let blocks=loadBlocks();
-let username=loadUsername();
-let currentView='threeDay';
+blocks=loadBlocks();
+username=loadUsername();
 
-// ═══════════════════════════════════════════════════════════════
-//  HELPERS
-// ═══════════════════════════════════════════════════════════════
 function todayStr(){return new Date().toISOString().slice(0,10);}
-function dateStr(offset){
-  var d=new Date();d.setDate(d.getDate()+offset);
-  return d.toISOString().slice(0,10);
-}
+function dateStr(offset){var d=new Date();d.setDate(d.getDate()+offset);return d.toISOString().slice(0,10);}
 function fmtDate(date){var d=new Date(date);return (d.getMonth()+1)+'月'+d.getDate()+'日';}
-function fmtDow(date){
-  var dows=['周日','周一','周二','周三','周四','周五','周六'];
-  return dows[new Date(date).getDay()];
-}
+function fmtDow(date){var dows=['周日','周一','周二','周三','周四','周五','周六'];return dows[new Date(date).getDay()];}
 function fmtMinutes(min){
   if(min>=60){var h=Math.floor(min/60);var m=min%60;return m>0?h+'h '+m+'m':h+'小时';}
   return min+'分钟';
-}
-function catColor(cat){
-  var map={work:'#a5d6a7',study:'#90caf9',exercise:'#ffcc80',rest:'#ce93d8',other:'#b0bec5'};
-  return map[cat]||'#b0bec5';
 }
 function catName(cat){
   var map={work:'工作',study:'学习',exercise:'运动',rest:'休息',other:'其他'};
@@ -710,7 +829,7 @@ function catName(cat){
 }
 
 // ═══════════════════════════════════════════════════════════════
-//  RENDER ENGINE
+//  RENDER
 // ═══════════════════════════════════════════════════════════════
 function renderAll(){
   document.getElementById('titleText').textContent=username;
@@ -731,55 +850,31 @@ function renderThreeDay(){
     var date=dateStr(offsets[i]);
     var entries=loadEntries(date);
     var totalMin=0,doneCount=0,failedCount=0;
-    entries.forEach(function(e){
-      totalMin+=e.duration||0;
-      if(e.status==='done')doneCount++;
-      else if(e.status==='failed')failedCount++;
-    });
-    html+='<div class="day-card'+extras[i]+'" data-tilt data-date="'+date+'">';
-    html+='<div class="card-tilt-surface">';
+    entries.forEach(function(e){totalMin+=e.duration||0;if(e.status==='done')doneCount++;else if(e.status==='failed')failedCount++;});
+    html+='<div class="day-card'+extras[i]+'" data-tilt data-date="'+date+'"><div class="card-tilt-surface">';
     html+='<div class="day-label">'+labels[i]+' · '+fmtDow(date)+' · '+fmtDate(date)+'</div>';
-
     if(entries.length===0){
       html+='<div class="empty-state"><div class="icon">📦</div><div class="msg">空的箱子</div></div>';
     }else{
       entries.forEach(function(e,j){
         var cls=e.status==='done'?'done':(e.status==='failed'?'failed':'pending');
-        var statusText=e.status==='done'?'✅ 完成':(e.status==='failed'?'❌ 破裂':'待执行');
-        var statusColor=e.status==='done'?'#6aaa80':(e.status==='failed'?'#c87070':'#b89040');
-        var dotColor=e.status==='done'?'#66bb6a':(e.status==='failed'?'#e57373':'#d4a040');
+        var stText=e.status==='done'?'✅ 完成':(e.status==='failed'?'❌ 破裂':'待执行');
+        var stColor=e.status==='done'?'#8ce0a8':(e.status==='failed'?'#e89898':'#c8a860');
+        var dotColor=e.status==='done'?'#5ab880':(e.status==='failed'?'#d06868':'#d4a040');
         var pulseCls=e.status==='pending'?' pulse':'';
-        var height=Math.max(44,Math.min(80,24+(e.duration||30)/60*28));
+        var height=Math.max(48,Math.min(88,28+(e.duration||30)/60*30));
         html+='<div class="task-block '+cls+'" style="height:'+height+'px" data-entry-id="'+e.id+'" data-date="'+date+'" onclick="cycleEntryStatus(this)">';
-        html+='<div class="block-inner">';
-        html+='<div>';
-        html+='<div class="task-name">';
+        html+='<div class="block-inner"><div><div class="task-name">';
         html+='<span class="task-dot'+pulseCls+'" style="background:'+dotColor+';box-shadow:0 0 10px '+dotColor+'44;"></span>';
-        html+=e.name+'</div>';
-        html+='<div class="task-meta" style="color:'+statusColor+';">'+statusText+'</div></div>';
-        html+='<span class="task-duration">'+fmtMinutes(e.duration)+'</span>';
-        html+='</div></div>';
-
-        // idle gap before next entry
-        if(j<entries.length-1){
-          html+='<div class="idle-gap"><div class="line"></div><span>空闲</span><div class="line"></div></div>';
-        }
+        html+=e.name+'</div><div class="task-meta" style="color:'+stColor+';">'+stText+'</div></div>';
+        html+='<span class="task-duration">'+fmtMinutes(e.duration)+'</span></div></div>';
+        if(j<entries.length-1) html+='<div class="idle-gap"><div class="line"></div><span>空闲</span><div class="line"></div></div>';
       });
     }
-
-    // Add block button
-    html+='<div style="margin-top:10px;position:relative;z-index:1;">';
-    html+='<div class="add-block" onclick="openPicker(\''+date+'\')">+ 从方块库添加</div>';
-    html+='</div>';
-
-    // Batch buttons (only for today)
+    html+='<div style="margin-top:10px;position:relative;z-index:1;"><div class="add-block" onclick="openPicker(\''+date+'\')">+ 从方块库添加</div></div>';
     if(offsets[i]===0&&entries.length>0){
-      html+='<div class="btn-row">';
-      html+='<button class="btn btn-done" data-ripple onclick="batchMark(\''+date+'\',\'done\')">✅ 全部完成</button>';
-      html+='<button class="btn btn-fail" data-ripple onclick="batchMark(\''+date+'\',\'failed\')">💔 全部破裂</button>';
-      html+='</div>';
+      html+='<div class="btn-row"><button class="btn btn-done" data-ripple onclick="batchMark(\''+date+'\',\'done\')">✅ 全部完成</button><button class="btn btn-fail" data-ripple onclick="batchMark(\''+date+'\',\'failed\')">💔 全部破裂</button></div>';
     }
-
     html+='<div class="card-summary">📊 '+(doneCount+failedCount)+'/'+entries.length+' 完成 · 总计 '+fmtMinutes(totalMin)+'</div>';
     html+='</div></div>';
   }
@@ -793,66 +888,79 @@ function renderSevenDay(){
   for(var i=6;i>=0;i--){
     var date=dateStr(-i);
     var entries=loadEntries(date);
-    var totalMin=0,doneCount=0,failedCount=0;
+    var totalMin=0,doneCount=0,failedCount=0,pendingCount=0;
+    var cats={};
     entries.forEach(function(e){
       totalMin+=e.duration||0;
       if(e.status==='done')doneCount++;
       else if(e.status==='failed')failedCount++;
+      else pendingCount++;
+      var c=e.category||'other';
+      cats[c]=(cats[c]||0)+1;
     });
-    var total=doneCount+failedCount;
+    var total=doneCount+failedCount+pendingCount;
     var donePct=total>0?Math.round(doneCount/total*100):0;
+    var failPct=total>0?Math.round(failedCount/total*100):0;
     html+='<div class="overview-day">';
     html+='<div class="dow">'+fmtDow(date)+'</div>';
-    html+='<div class="date">'+new Date(date).getDate()+'</div>';
-    html+='<div class="done-count">✅ '+doneCount+'</div>';
-    if(failedCount>0)html+='<div class="fail-count">❌ '+failedCount+'</div>';
-    html+='<div class="total-hours">'+fmtMinutes(totalMin)+'</div>';
-    html+='<div class="stat-bar"><div class="done" style="width:'+donePct+'%"></div>';
-    var failPct=total>0?Math.round(failedCount/total*100):0;
-    html+='<div class="failed" style="width:'+failPct+'%"></div>';
-    html+='<div class="empty"></div></div>';
+    html+='<div class="date-num">'+(new Date(date).getMonth()+1)+'/'+new Date(date).getDate()+'</div>';
+    html+='<div class="stat-row">';
+    html+='<span class="stat-item done">✅ '+doneCount+'</span>';
+    html+='<span class="stat-item fail">❌ '+failedCount+'</span>';
+    if(pendingCount>0)html+='<span class="stat-item pend">⏳ '+pendingCount+'</span>';
     html+='</div>';
+    html+='<div class="total-hours">⏱ '+fmtMinutes(totalMin)+'</div>';
+    html+='<div class="stat-bar"><div class="done" style="width:'+donePct+'%"></div><div class="failed" style="width:'+failPct+'%"></div><div class="empty"></div></div>';
+    html+='<div class="cat-tags">';
+    Object.keys(cats).forEach(function(c){html+='<span class="cat-tag">'+catName(c)+' ×'+cats[c]+'</span>';});
+    html+='</div></div>';
   }
   grid.innerHTML=html;
 }
 
 function renderWeekly(){
   var container=document.getElementById('weeklyContent');
-  // Current week (Mon-Sun)
-  var d=new Date();var day=d.getDay();var diff=d.getDate()-day+(day===0?-6:1);
+  var d=new Date();var day=d.getDay();
+  var diff=d.getDate()-day+(day===0?-6:1);
   d.setDate(diff);
   var weekStart=new Date(d);
   var html='';
-  for(var w=0;w<4;w++){ // last 4 weeks
+  for(var w=0;w<4;w++){
     var ws=new Date(weekStart);ws.setDate(ws.getDate()-w*7);
     var we=new Date(ws);we.setDate(we.getDate()+6);
-    var totalMin=0,doneCount=0,failedCount=0;
+    var totalMin=0,doneCount=0,failedCount=0,pendingCount=0;
+    var cats={};
     for(var i=0;i<7;i++){
       var dt=new Date(ws);dt.setDate(dt.getDate()+i);
-      var dateStr2=dt.toISOString().slice(0,10);
-      var entries=loadEntries(dateStr2);
+      var ds=dt.toISOString().slice(0,10);
+      var entries=loadEntries(ds);
       entries.forEach(function(e){
         totalMin+=e.duration||0;
         if(e.status==='done')doneCount++;
         else if(e.status==='failed')failedCount++;
+        else pendingCount++;
+        var c=e.category||'other';cats[c]=(cats[c]||0)+1;
       });
     }
-    var total=doneCount+failedCount;
+    var total=doneCount+failedCount+pendingCount;
     var rate=total>0?Math.round(doneCount/total*100):0;
     html+='<div class="week-summary-card">';
     html+='<h3>📅 '+(ws.getMonth()+1)+'/'+ws.getDate()+' - '+(we.getMonth()+1)+'/'+we.getDate()+'</h3>';
-    html+='<div style="display:flex;gap:24px;font-size:14px;">';
-    html+='<div>✅ 完成 <strong>'+doneCount+'</strong></div>';
-    html+='<div>❌ 破裂 <strong>'+failedCount+'</strong></div>';
+    html+='<div style="display:flex;gap:28px;font-size:15px;flex-wrap:wrap;">';
+    html+='<div>✅ 完成 <strong style="color:#8ce0a8;">'+doneCount+'</strong></div>';
+    html+='<div>❌ 破裂 <strong style="color:#e89898;">'+failedCount+'</strong></div>';
+    html+='<div>⏳ 待定 <strong style="color:#c8a860;">'+pendingCount+'</strong></div>';
     html+='<div>📊 完成率 <strong>'+rate+'%</strong></div>';
     html+='<div>⏱ 总计 <strong>'+fmtMinutes(totalMin)+'</strong></div>';
     html+='</div>';
-    // simple bar
-    html+='<div style="margin-top:12px;background:rgba(0,0,0,0.04);border-radius:6px;height:8px;overflow:hidden;display:flex;">';
-    if(total>0){
-      html+='<div style="width:'+rate+'%;background:linear-gradient(90deg,#a5d6a7,#66bb6a);height:100%;border-radius:6px;"></div>';
+    if(Object.keys(cats).length>0){
+      html+='<div style="margin-top:12px;display:flex;gap:6px;flex-wrap:wrap;">';
+      Object.keys(cats).forEach(function(c){html+='<span class="cat-tag" style="font-size:11px;">'+catName(c)+' ×'+cats[c]+'</span>';});
+      html+='</div>';
     }
-    html+='<div style="flex:1;background:rgba(0,0,0,0.03);height:100%;"></div>';
+    html+='<div style="margin-top:14px;background:rgba(255,255,255,0.04);border-radius:8px;height:8px;overflow:hidden;display:flex;">';
+    if(total>0) html+='<div style="width:'+rate+'%;background:linear-gradient(90deg,#5aaa7a,#3a8a4a);height:100%;border-radius:8px;"></div>';
+    html+='<div style="flex:1;background:rgba(255,255,255,0.02);height:100%;"></div>';
     html+='</div></div>';
   }
   container.innerHTML=html;
@@ -864,12 +972,10 @@ function renderLibrary(){
   blocks.forEach(function(b){
     html+='<div class="lib-block">';
     html+='<div class="block-name">'+b.name+'</div>';
-    html+='<div class="block-info">';
-    html+='<span>⏱ '+fmtMinutes(b.duration)+'</span>';
-    html+='<span>📁 '+catName(b.category||'other')+'</span>';
+    html+='<div class="block-info"><span>⏱ '+fmtMinutes(b.duration)+'</span><span>📁 '+catName(b.category||'other')+'</span>';
     if(b.priority)html+='<span>⚡ '+b.priority+'</span>';
     html+='</div>';
-    if(b.notes)html+='<div style="font-size:11px;color:#b0b0b8;margin-top:4px;">'+b.notes+'</div>';
+    if(b.notes)html+='<div style="font-size:12px;color:#6a6a74;margin-top:6px;">'+b.notes+'</div>';
     html+='<div class="block-actions">';
     html+='<button onclick="event.stopPropagation();editBlock(\''+b.id+'\')">✏️ 编辑</button>';
     html+='<button class="danger" onclick="event.stopPropagation();deleteBlock(\''+b.id+'\')">🗑 删除</button>';
@@ -883,12 +989,10 @@ function renderLibrary(){
 //  INTERACTIONS
 // ═══════════════════════════════════════════════════════════════
 function cycleEntryStatus(el){
-  var entryId=el.dataset.entryId;
-  var date=el.dataset.date;
+  var entryId=el.dataset.entryId,date=el.dataset.date;
   var entries=loadEntries(date);
   var entry=entries.find(function(e){return e.id===entryId;});
   if(!entry)return;
-  // cycle: pending → done → failed → pending
   if(entry.status==='pending')entry.status='done';
   else if(entry.status==='done')entry.status='failed';
   else entry.status='pending';
@@ -903,9 +1007,6 @@ function batchMark(date,status){
   renderAll();
 }
 
-// ═══════════════════════════════════════════════════════════════
-//  BLOCK PICKER (add to day)
-// ═══════════════════════════════════════════════════════════════
 function openPicker(date){
   var html='<div class="modal-overlay" onclick="if(event.target===this)closeModal()">';
   html+='<div class="modal"><h3>选择方块 · '+fmtDate(date)+'</h3>';
@@ -915,14 +1016,12 @@ function openPicker(date){
     html+='<div class="picker-list">';
     blocks.forEach(function(b){
       html+='<div class="picker-item" onclick="addBlockToDay(\''+date+'\',\''+b.id+'\')">';
-      html+='<div><div class="pick-name">'+b.name+'</div><div style="font-size:11px;color:#b0b0b8;">'+catName(b.category||'other')+'</div></div>';
-      html+='<span class="pick-dur">'+fmtMinutes(b.duration)+'</span>';
-      html+='</div>';
+      html+='<div><div class="pick-name">'+b.name+'</div><div style="font-size:11px;color:#7c7c86;">'+catName(b.category||'other')+'</div></div>';
+      html+='<span class="pick-dur">'+fmtMinutes(b.duration)+'</span></div>';
     });
     html+='</div>';
   }
-  html+='<div class="modal-actions"><button class="btn-cancel" onclick="closeModal()">取消</button></div>';
-  html+='</div></div>';
+  html+='<div class="modal-actions"><button class="btn-cancel" onclick="closeModal()">取消</button></div></div></div>';
   document.getElementById('modalContainer').innerHTML=html;
 }
 
@@ -930,23 +1029,10 @@ function addBlockToDay(date,blockId){
   var block=blocks.find(function(b){return b.id===blockId;});
   if(!block)return;
   var entries=loadEntries(date);
-  entries.push({
-    id:uid(),
-    name:block.name,
-    duration:block.duration,
-    category:block.category||'other',
-    priority:block.priority||'medium',
-    status:'pending',
-    order:entries.length
-  });
-  saveEntries(date,entries);
-  closeModal();
-  renderAll();
+  entries.push({id:uid(),name:block.name,duration:block.duration,category:block.category||'other',priority:block.priority||'medium',status:'pending',order:entries.length});
+  saveEntries(date,entries);closeModal();renderAll();
 }
 
-// ═══════════════════════════════════════════════════════════════
-//  BLOCK LIBRARY CRUD
-// ═══════════════════════════════════════════════════════════════
 function openBlockForm(blockId){
   var block=blockId?blocks.find(function(b){return b.id===blockId;}):null;
   var isEdit=!!block;
@@ -965,10 +1051,8 @@ function openBlockForm(blockId){
   });
   html+='</select>';
   html+='<label>备注</label><textarea id="bfNotes" placeholder="可选">'+(block?block.notes||'':'')+'</textarea>';
-  html+='<div class="modal-actions">';
-  html+='<button class="btn-cancel" onclick="closeModal()">取消</button>';
-  html+='<button class="btn-primary" onclick="saveBlockForm(\''+(isEdit?block.id:'')+'\')">'+(isEdit?'保存修改':'创建方块')+'</button>';
-  html+='</div></div></div>';
+  html+='<div class="modal-actions"><button class="btn-cancel" onclick="closeModal()">取消</button>';
+  html+='<button class="btn-primary" onclick="saveBlockForm(\''+(isEdit?block.id:'')+'\')">'+(isEdit?'保存修改':'创建方块')+'</button></div></div></div>';
   document.getElementById('modalContainer').innerHTML=html;
 }
 
@@ -979,29 +1063,20 @@ function saveBlockForm(blockId){
   var priority=document.getElementById('bfPriority').value;
   var notes=document.getElementById('bfNotes').value.trim();
   if(!name){alert('请输入方块名称');return;}
-
   if(blockId){
     var block=blocks.find(function(b){return b.id===blockId;});
-    if(block){
-      block.name=name;block.duration=duration;block.category=category;
-      block.priority=priority;block.notes=notes;
-    }
+    if(block){block.name=name;block.duration=duration;block.category=category;block.priority=priority;block.notes=notes;}
   }else{
     blocks.push({id:uid(),name:name,duration:duration,category:category,priority:priority,notes:notes});
   }
-  saveBlocks(blocks);
-  closeModal();
-  renderAll();
+  saveBlocks(blocks);closeModal();renderAll();
 }
 
 function editBlock(id){openBlockForm(id);}
 function deleteBlock(id){
   if(!confirm('确定删除这个方块？已放入箱子的副本不受影响。'))return;
-  blocks=blocks.filter(function(b){return b.id!==id;});
-  saveBlocks(blocks);
-  renderAll();
+  blocks=blocks.filter(function(b){return b.id!==id;});saveBlocks(blocks);renderAll();
 }
-
 function closeModal(){document.getElementById('modalContainer').innerHTML='';}
 
 // ═══════════════════════════════════════════════════════════════
@@ -1014,29 +1089,22 @@ document.getElementById('appTitle').addEventListener('click',function(e){
   var input=document.createElement('input');
   input.value=current;
   input.style.width=(Math.max(current.length,3)*20+20)+'px';
-  span.replaceWith(input);
-  input.focus();
-  input.select();
-
+  span.replaceWith(input);input.focus();input.select();
   function save(){
     var newName=input.value.trim()||'Asuka';
-    username=newName;
-    saveUsername(username);
-    var newSpan=document.createElement('span');
-    newSpan.id='titleText';
-    newSpan.textContent=newName;
+    username=newName;saveUsername(username);
+    var newSpan=document.createElement('span');newSpan.id='titleText';newSpan.textContent=newName;
     input.replaceWith(newSpan);
   }
   input.addEventListener('blur',save);
-  input.addEventListener('keydown',function(ev){if(ev.key==='Enter'){input.blur();}});
+  input.addEventListener('keydown',function(ev){if(ev.key==='Enter')input.blur();});
 });
 
 // ═══════════════════════════════════════════════════════════════
 //  TAB SWITCHING
 // ═══════════════════════════════════════════════════════════════
 document.getElementById('tabs').addEventListener('click',function(e){
-  var tab=e.target.closest('.tab');
-  if(!tab)return;
+  var tab=e.target.closest('.tab');if(!tab)return;
   document.querySelectorAll('#tabs .tab').forEach(function(t){t.classList.remove('active');});
   tab.classList.add('active');
   currentView=tab.dataset.view;
@@ -1052,20 +1120,16 @@ function initTilt(){
   var cards=document.querySelectorAll('[data-tilt]');
   cards.forEach(function(card){
     if(card._tiltBound)return;card._tiltBound=true;
-    var surface=card.querySelector('.card-tilt-surface');
-    if(!surface)return;
+    var surface=card.querySelector('.card-tilt-surface');if(!surface)return;
     card.addEventListener('mousemove',function(e){
       var rect=card.getBoundingClientRect();
-      var x=e.clientX-rect.left;var y=e.clientY-rect.top;
-      var hw=rect.width/2;var hh=rect.height/2;
-      var ry=((x-hw)/hw*8).toFixed(2);
-      var rx=(-(y-hh)/hh*8).toFixed(2);
-      surface.style.setProperty('--tilt-x',rx+'deg');
-      surface.style.setProperty('--tilt-y',ry+'deg');
+      var x=e.clientX-rect.left,y=e.clientY-rect.top;
+      var hw=rect.width/2,hh=rect.height/2;
+      surface.style.setProperty('--tilt-x',(-(y-hh)/hh*8).toFixed(2)+'deg');
+      surface.style.setProperty('--tilt-y',((x-hw)/hw*8).toFixed(2)+'deg');
     });
     card.addEventListener('mouseleave',function(){
-      surface.style.setProperty('--tilt-x','0deg');
-      surface.style.setProperty('--tilt-y','0deg');
+      surface.style.setProperty('--tilt-x','0deg');surface.style.setProperty('--tilt-y','0deg');
     });
   });
 }
@@ -1074,10 +1138,8 @@ function initTilt(){
 //  RIPPLE
 // ═══════════════════════════════════════════════════════════════
 document.addEventListener('click',function(e){
-  var target=e.target.closest('[data-ripple]');
-  if(!target)return;
-  var ripple=document.createElement('span');
-  ripple.className='ripple';
+  var target=e.target.closest('[data-ripple]');if(!target)return;
+  var ripple=document.createElement('span');ripple.className='ripple';
   var rect=target.getBoundingClientRect();
   var size=Math.max(rect.width,rect.height)*2;
   ripple.style.width=ripple.style.height=size+'px';
@@ -1091,46 +1153,23 @@ document.addEventListener('click',function(e){
 //  IMAGE EXPORT
 // ═══════════════════════════════════════════════════════════════
 function exportImage(viewId){
-  var el=document.getElementById('view-'+viewId);
-  if(!el)return;
-  // Simple approach: use SVG foreignObject
-  var clone=el.cloneNode(true);
-  // Remove tilt transforms for clean export
-  clone.querySelectorAll('.card-tilt-surface').forEach(function(s){s.style.transform='none';});
-  clone.querySelectorAll('.day-card').forEach(function(c){c.style.perspective='none';});
-  // Remove sheen pseudo-elements visually (can't clone pseudo)
+  var el=document.getElementById('view-'+viewId);if(!el)return;
   var rect=el.getBoundingClientRect();
-  var w=rect.width;var h=rect.height;
-
-  // Use canvas-based export via html2canvas approach
-  // For simplicity, use a basic DOM→Image approach
-  var data='<div style="font-family:system-ui,sans-serif;background:#f5f5f9;padding:20px;width:'+w+'px;">'+clone.outerHTML+'</div>';
-
-  // Fallback: use window.print or just provide a screenshot instruction
-  // Actually, let's implement a proper canvas export using SVG
+  var w=rect.width,h=rect.height;
   var svg='<svg xmlns="http://www.w3.org/2000/svg" width="'+w+'" height="'+h+'">'+
     '<foreignObject width="100%" height="100%">'+
-    '<div xmlns="http://www.w3.org/1999/xhtml" style="font-family:system-ui,sans-serif;background:#f5f5f9;padding:20px;">'+
-    el.innerHTML+
-    '</div></foreignObject></svg>';
-
+    '<div xmlns="http://www.w3.org/1999/xhtml" style="font-family:system-ui,sans-serif;background:#1a1a22;color:#e8e8ed;padding:20px;">'+
+    el.innerHTML+'</div></foreignObject></svg>';
   var img=new Image();
   var blob=new Blob([svg],{type:'image/svg+xml;charset=utf-8'});
   var url=URL.createObjectURL(blob);
   img.onload=function(){
-    var canvas=document.createElement('canvas');
-    canvas.width=w*2;canvas.height=h*2;
-    var ctx=canvas.getContext('2d');
-    ctx.scale(2,2);
-    // Draw white bg first
-    ctx.fillStyle='#f5f5f9';
-    ctx.fillRect(0,0,w,h);
-    ctx.drawImage(img,0,0);
-    URL.revokeObjectURL(url);
+    var canvas=document.createElement('canvas');canvas.width=w*2;canvas.height=h*2;
+    var ctx=canvas.getContext('2d');ctx.scale(2,2);
+    ctx.fillStyle='#1a1a22';ctx.fillRect(0,0,w,h);
+    ctx.drawImage(img,0,0);URL.revokeObjectURL(url);
     var link=document.createElement('a');
-    link.download='timeplanner-'+todayStr()+'.png';
-    link.href=canvas.toDataURL('image/png');
-    link.click();
+    link.download='timeplanner-'+todayStr()+'.png';link.href=canvas.toDataURL('image/png');link.click();
   };
   img.src=url;
 }
@@ -1139,7 +1178,6 @@ function exportImage(viewId){
 //  INIT
 // ═══════════════════════════════════════════════════════════════
 renderAll();
-// Auto-update date badge every minute
 setInterval(function(){
   document.getElementById('dateBadge').textContent='📅 '+fmtDate(todayStr())+' · '+fmtDow(todayStr());
 },60000);
