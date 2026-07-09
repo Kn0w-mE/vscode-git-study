@@ -370,31 +370,29 @@ var dragState=null;
 function initDrag(){
   document.querySelectorAll('.task-block').forEach(function(block){
     block.addEventListener('mousedown',function(e){
-      if(e.target.closest('.task-del'))return; // don't drag when clicking delete
+      if(e.target.closest('.task-del'))return;
       if(e.button!==0)return;
-      e.preventDefault();
       var rect=block.getBoundingClientRect();
       var timeline=block.closest('.timeline');
       var tlRect=timeline.getBoundingClientRect();
       dragState={
         block:block,
-        startY:e.clientY,
+        startX:e.clientX,startY:e.clientY,
         startTop:parseFloat(block.style.top),
         offsetY:e.clientY-rect.top,
-        timeline:timeline,
-        tlTop:tlRect.top,
-        date:block.dataset.date,
-        entryId:block.dataset.entryId
+        timeline:timeline,tlTop:tlRect.top,
+        date:block.dataset.date,entryId:block.dataset.entryId,
+        moved:false
       };
-      block.classList.add('dragging');
     });
   });
 
   document.addEventListener('mousemove',function(e){
     if(!dragState)return;
-    var dy=e.clientY-dragState.startY;
+    var dx=e.clientX-dragState.startX,dy=e.clientY-dragState.startY;
+    if(!dragState.moved&&Math.abs(dx)<4&&Math.abs(dy)<4)return;
+    if(!dragState.moved){dragState.moved=true;dragState.block.classList.add('dragging');}
     var newTop=dragState.startTop+dy;
-    // Clamp to timeline bounds
     newTop=Math.max(0,Math.min(newTop,timeToTop(END_H*60)-SLOT_H));
     dragState.block.style.top=newTop+'px';
   });
@@ -403,38 +401,27 @@ function initDrag(){
     if(!dragState)return;
     var block=dragState.block;
     block.classList.remove('dragging');
+    if(!dragState.moved){dragState=null;return;} // just a click, let click handler work
     var newTop=parseFloat(block.style.top);
     var newTime=topToTime(newTop);
-    // Snap to nearest 15min
     newTime=Math.round(newTime/15)*15;
     newTime=Math.max(START_H*60,Math.min(END_H*60-15,newTime));
-    // Get the entry being moved
     var entries=le(dragState.date);
     var entry=entries.find(function(x){return x.id===dragState.entryId;});
     if(!entry){dragState=null;return;}
     var dur=entry.duration||30;
-    // Check overlap with other entries, push down if needed
     var others=entries.filter(function(x){return x.id!==dragState.entryId;});
     for(var iter=0;iter<20;iter++){
       var overlap=false;
-      for(var i=0;i<others.length;i++){
-        var o=others[i];
-        var oStart=o.startTime||START_H*60;
-        var oEnd=oStart+(o.duration||30);
-        if(newTime<oEnd&&(newTime+dur)>oStart){overlap=true;break;}
-      }
+      for(var i=0;i<others.length;i++){var o=others[i];var oStart=o.startTime||START_H*60;var oEnd=oStart+(o.duration||30);if(newTime<oEnd&&(newTime+dur)>oStart){overlap=true;break;}}
       if(!overlap)break;
-      newTime+=15; // push down by 15min
+      newTime+=15;
     }
     newTime=Math.min(END_H*60-dur,newTime);
     entry.startTime=newTime;se(dragState.date,entries);
-    // Save scroll position before re-render
-    var wrap=dragState.block.closest('.timeline-wrap');
-    var scrollTop=wrap?wrap.scrollTop:0;
-    var date=dragState.date;
-    dragState=null;
+    var wrap=block.closest('.timeline-wrap');var scrollTop=wrap?wrap.scrollTop:0;
+    var date=dragState.date;dragState=null;
     renderThreeDay();
-    // Restore scroll position
     var newWrap=document.getElementById('tw-'+date);
     if(newWrap)newWrap.scrollTop=scrollTop;
   });
